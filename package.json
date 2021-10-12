@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/portalnetwork.js",
   "scripts": {
+    "prepare": "yarn build",
     "build": "rollup -c"
   },
   "types": "dist/src/index.d.ts",
