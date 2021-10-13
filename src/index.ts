@@ -1,2 +1,2 @@
 export { Discv5 } from '@chainsafe/discv5';
-export { OverlayRoutingTable } from './dht/index'
+export { OverlayRoutingTable, distance } from './dht/index'

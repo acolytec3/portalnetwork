@@ -1,24 +1,20 @@
 import { ENR, KademliaRoutingTable, NodeId } from '@chainsafe/discv5'
 import { BN } from 'bn.js';
+import { distance } from './util'
 
-const distance = (id: string, nodeId: string): number => {
-    return new BN(id).sub(new BN(nodeId)).toNumber();
-}
 
 export class OverlayRoutingTable extends KademliaRoutingTable {
-
-    constructor(localId: NodeId, k: number) {
-        super(localId, k);
-    }
-
     nearest(id: NodeId, limit: number): ENR[] {
         const results: ENR[] = [];
         this.buckets.forEach((bucket) => {
             results.push(...bucket.values());
         });
         results.sort((a, b) => {
-            return distance(id, a.nodeId) - distance(id, b.nodeId);
-        });
+            const diff = distance(id, a.nodeId).sub(distance(id, b.nodeId));
+            if (diff.isNeg()) return -1;
+            if (diff.isZero()) return 0;
+            return 1;
+        })
         return results.slice(0, limit);
     }
 }
