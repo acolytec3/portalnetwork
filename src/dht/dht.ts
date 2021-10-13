@@ -4,6 +4,13 @@ import { distance } from './util'
 
 
 export class OverlayRoutingTable extends KademliaRoutingTable {
+
+    /**
+     *
+     * @param id id of node to find nearest nodes to
+     * @param limit maximum number of nodes to return
+     * @returns array of `limit` nearest nodes
+     */
     nearest(id: NodeId, limit: number): ENR[] {
         const results: ENR[] = [];
         this.buckets.forEach((bucket) => {
