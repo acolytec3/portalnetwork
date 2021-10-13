@@ -8,7 +8,7 @@
   "scripts": {
     "build": "rollup -c"
   },
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
   "author": "acolytec3",
   "license": "MIT",
   "dependencies": {
