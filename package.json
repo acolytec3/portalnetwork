@@ -2,7 +2,9 @@
   "name": "portalnetwork",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/portalnetwork.js",
+  "main": "dist/portalnetwork.cjs.js",
+  "browser": "dist/portalnetwork.js",
+  "module": "dist/portalnetwork.es.js",
   "scripts": {
     "prepare": "yarn build",
     "build": "rollup -c"
@@ -26,6 +28,5 @@
     "rollup-plugin-terser": "^7.0.2",
     "tslib": "^2.3.1",
     "typescript": "^4.4.2"
-  },
-  "browser": "dist/portalnetwork.js"
+  }
 }
