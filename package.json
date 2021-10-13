@@ -6,7 +6,6 @@
   "browser": "dist/portalnetwork.js",
   "module": "dist/portalnetwork.es.js",
   "scripts": {
-    "prepare": "yarn build",
     "build": "rollup -c"
   },
   "types": "dist/src/index.d.ts",
