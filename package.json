@@ -12,7 +12,9 @@
   "author": "acolytec3",
   "license": "MIT",
   "dependencies": {
-    "@chainsafe/discv5": "github:acolytec3/discv5#c55a5ad3955401857f8648852820bb05026a69ca"
+    "@chainsafe/discv5": "github:acolytec3/discv5#c55a5ad3955401857f8648852820bb05026a69ca",
+    "@types/bn.js": "^5.1.0",
+    "bn.js": "^5.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
