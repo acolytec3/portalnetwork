@@ -6,8 +6,8 @@
 
 ### Classes
 
-- [Discv5](classes/Discv5.md)
 - [OverlayRoutingTable](classes/OverlayRoutingTable.md)
+- [PortalNetwork](classes/PortalNetwork.md)
 
 ### Functions
 
@@ -35,4 +35,4 @@ https://github.com/ethereum/portal-network-specs/blob/master/state-network.md#di
 
 #### Defined in
 
-[src/dht/util.ts:10](https://github.com/acolytec3/portalnetwork/blob/5a2a82a/src/dht/util.ts#L10)
+[src/dht/util.ts:11](https://github.com/acolytec3/portalnetwork/blob/87e95ab/src/dht/util.ts#L11)

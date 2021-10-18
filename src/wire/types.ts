@@ -1,3 +1,5 @@
+import { Container } from "@chainsafe/ssz";
+
 export enum SubNetwork {
     state = 0x500A,
     history = 0x500B,
@@ -15,4 +17,14 @@ export enum MessageType {
     CONTENT = 0x06,
     OFFER = 0x07,
     ACCEPT = 0x08
+}
+
+export interface PingMessage {
+    selector: MessageType.PING,
+    ping: any
+}
+
+export interface PongMessage {
+    selector: MessageType.PONG,
+    pong: any
 }

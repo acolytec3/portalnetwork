@@ -369,7 +369,7 @@ ___
 ▸ **getMaxListeners**(): `number`
 
 Returns the current max listener value for the `EventEmitter` which is either
-set by `emitter.setMaxListeners(n)` or defaults to {@link defaultMaxListeners}.
+set by `emitter.setMaxListeners(n)` or defaults to [defaultMaxListeners](PortalNetwork.md#defaultmaxlisteners).
 
 **`since`** v1.0.0
 
@@ -544,7 +544,7 @@ KademliaRoutingTable.nearest
 
 #### Defined in
 
-[src/dht/dht.ts:14](https://github.com/acolytec3/portalnetwork/blob/5a2a82a/src/dht/dht.ts#L14)
+[src/dht/dht.ts:13](https://github.com/acolytec3/portalnetwork/blob/87e95ab/src/dht/dht.ts#L13)
 
 ___
 

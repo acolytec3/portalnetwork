@@ -15,4 +15,12 @@ export declare enum MessageType {
     OFFER = 7,
     ACCEPT = 8
 }
+export interface PingMessage {
+    selector: MessageType.PING;
+    ping: any;
+}
+export interface PongMessage {
+    selector: MessageType.PONG;
+    pong: any;
+}
 //# sourceMappingURL=types.d.ts.map
