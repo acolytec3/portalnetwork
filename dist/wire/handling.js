@@ -1,2 +1,2 @@
-export const sendMessage = async () => {
+export const sendMessage = async (payload) => {
 };

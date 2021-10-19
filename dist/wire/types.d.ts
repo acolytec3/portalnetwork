@@ -1,3 +1,4 @@
+import { ByteVectorType, Number64UintType } from "@chainsafe/ssz";
 export declare enum SubNetwork {
     state = 20490,
     history = 20491,
@@ -15,10 +16,10 @@ export declare enum MessageType {
     OFFER = 7,
     ACCEPT = 8
 }
-export interface PingMessage {
-    selector: MessageType.PING;
-    ping: any;
-}
+export declare type PingMessageType = {
+    enr_seq: Number64UintType;
+    custom_payload: ByteVectorType;
+};
 export interface PongMessage {
     selector: MessageType.PONG;
     pong: any;

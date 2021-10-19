@@ -5,6 +5,7 @@
   "main": "dist/portalnetwork.js",
   "browser": "dist/portalnetwork.js",
   "scripts": {
+    "dev": "tsc --declaration --outDir dist --watch",
     "build": "tsc --declaration --outDir dist",
     "docs": "typedoc src/index.ts"
   },
@@ -15,12 +16,14 @@
     "@chainsafe/discv5": "github:acolytec3/discv5#c55a5ad3955401857f8648852820bb05026a69ca",
     "@chainsafe/ssz": "^0.8.19",
     "@types/bn.js": "^5.1.0",
-    "bn.js": "^5.2.0"
+    "bn.js": "^5.2.0",
+    "debug": "^4.3.2"
   },
   "peerDependencies": {
     "bn.js": "^5.2.0"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.7",
     "tslib": "^2.3.1",
     "typedoc": "^0.22.5",
     "typedoc-plugin-markdown": "^3.11.3",

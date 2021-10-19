@@ -1,2 +1,2 @@
-export declare const sendMessage: () => Promise<void>;
+export declare const sendMessage: (payload: any) => Promise<void>;
 //# sourceMappingURL=handling.d.ts.map
