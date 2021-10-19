@@ -1,1 +1,0 @@
-export { PortalNetwork } from './client';
