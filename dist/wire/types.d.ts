@@ -1,12 +1,12 @@
-import { ByteVectorType, Number64UintType } from "@chainsafe/ssz";
+import { ContainerType, ByteVector, UnionType } from "@chainsafe/ssz";
 export declare enum SubNetwork {
-    state = 20490,
-    history = 20491,
-    txGossip = 20492,
-    headerGossip = 20493,
-    canonIndices = 20494
+    state = "0x500A",
+    history = "0x500B",
+    txGossip = "0x500C",
+    headerGossip = "0x500D",
+    canonIndices = "0X500E"
 }
-export declare enum MessageType {
+export declare enum MessageCodes {
     PING = 1,
     PONG = 2,
     FINDNODES = 3,
@@ -16,12 +16,11 @@ export declare enum MessageType {
     OFFER = 7,
     ACCEPT = 8
 }
-export declare type PingMessageType = {
-    enr_seq: Number64UintType;
-    custom_payload: ByteVectorType;
-};
-export interface PongMessage {
-    selector: MessageType.PONG;
-    pong: any;
+export interface PingMessage {
+    enr_seq: Uint8Array;
+    custom_payload: ByteVector;
 }
+export declare const PingPongMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
+export declare const MessageType: UnionType<import("@chainsafe/ssz").Union<unknown>>;
+export declare const StateNetworkCustomDataType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 //# sourceMappingURL=types.d.ts.map

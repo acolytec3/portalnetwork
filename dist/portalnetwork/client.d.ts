@@ -5,6 +5,8 @@ import { EventEmitter } from 'events';
 export declare class PortalNetwork extends EventEmitter {
     client: Discv5;
     constructor(config: IDiscv5CreateOptions);
+    start: () => Promise<void>;
+    enableLog: (namespaces?: string) => void;
     sendPing: () => Promise<void>;
     onTalkReq: (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => void;
     onTalkResp: (srcId: string, sourceId: ENR | null, message: ITalkRespMessage) => void;
