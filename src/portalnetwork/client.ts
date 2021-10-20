@@ -28,7 +28,7 @@ export class PortalNetwork extends EventEmitter {
             enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
             custom_payload: payload
         })
-        this.client.broadcastTalkReq(Buffer.from(pingMsg), SubNetwork.state)
+        this.client.broadcastTalkReq(Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), SubNetwork.state)
     }
 
     public onTalkReq = (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
