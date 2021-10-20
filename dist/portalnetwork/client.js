@@ -17,13 +17,13 @@ export class PortalNetwork extends EventEmitter {
     enableLog = (namespaces = "portalnetwork*,discv5*") => {
         debug.enable(namespaces);
     };
-    sendPing = async () => {
+    sendPing = async (dstId) => {
         const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) });
         const pingMsg = PingPongMessageType.serialize({
             enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
             custom_payload: payload
         });
-        this.client.broadcastTalkReq(Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), SubNetwork.state);
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), SubNetwork.state);
     };
     onTalkReq = (srcId, sourceId, message) => {
         log(`TALKREQUEST message received from ${srcId}`);

@@ -22,13 +22,13 @@ export class PortalNetwork extends EventEmitter {
     public enableLog = (namespaces = "portalnetwork*,discv5*") => {
         debug.enable(namespaces)
     }
-    public sendPing = async () => {
+    public sendPing = async (dstId: string) => {
         const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) })
         const pingMsg = PingPongMessageType.serialize({
             enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
             custom_payload: payload
         })
-        this.client.broadcastTalkReq(Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), SubNetwork.state)
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), SubNetwork.state)
     }
 
     public onTalkReq = (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {

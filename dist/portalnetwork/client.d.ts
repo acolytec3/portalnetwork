@@ -7,7 +7,7 @@ export declare class PortalNetwork extends EventEmitter {
     constructor(config: IDiscv5CreateOptions);
     start: () => Promise<void>;
     enableLog: (namespaces?: string) => void;
-    sendPing: () => Promise<void>;
+    sendPing: (dstId: string) => Promise<void>;
     onTalkReq: (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => void;
     onTalkResp: (srcId: string, sourceId: ENR | null, message: ITalkRespMessage) => void;
 }
