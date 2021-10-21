@@ -8,7 +8,9 @@ export declare class PortalNetwork extends EventEmitter {
     start: () => Promise<void>;
     enableLog: (namespaces?: string) => void;
     sendPing: (dstId: string) => Promise<void>;
-    onTalkReq: (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => void;
+    private sendPong;
+    onTalkReq: (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => Promise<void>;
     onTalkResp: (srcId: string, sourceId: ENR | null, message: ITalkRespMessage) => void;
+    private decodeMessage;
 }
 //# sourceMappingURL=client.d.ts.map
