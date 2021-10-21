@@ -25,11 +25,12 @@ export class PortalNetwork extends EventEmitter {
             custom_payload: payload
         });
         this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), StateNetworkId);
+        log(`Sending PING to ${dstId.slice(0, 15)}... for ${StateNetworkId} subnetwork`);
     };
     sendPong = async (srcId, reqId) => {
         const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) });
         const pongMsg = PingPongMessageType.serialize({
-            enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
+            enr_seq: this.client.enr.seq,
             custom_payload: payload
         });
         log('PONG payload ', Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]));
@@ -45,6 +46,7 @@ export class PortalNetwork extends EventEmitter {
     };
     onTalkResp = (srcId, sourceId, message) => {
         log(`TALKRESPONSE message received from ${srcId}, ${message}`);
+        console.log(message);
     };
     decodeMessage = (message) => {
         if (message.type === MessageType.TALKREQ) {

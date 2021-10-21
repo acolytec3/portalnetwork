@@ -1,4 +1,4 @@
-import { ContainerType, ByteVectorType, BigIntUintType, UnionType } from "@chainsafe/ssz";
+import { ContainerType, BigIntUintType, UnionType, NumberUintType, BasicListType } from "@chainsafe/ssz";
 // Subnetwork IDs
 export const StateNetworkId = Uint8Array.from([0x50, 0x0A]);
 export const HistoryNetworkId = Uint8Array.from([0x50, 0x0B]);
@@ -20,7 +20,7 @@ export var MessageCodes;
 export const PingPongMessageType = new ContainerType({
     fields: {
         enr_seq: new BigIntUintType({ byteLength: 8 }),
-        custom_payload: new ByteVectorType({ length: 2048 })
+        custom_payload: new BasicListType({ limit: 2048, elementType: new NumberUintType({ byteLength: 1 }) })
     }
 });
 export const MessageType = new UnionType({ types: [PingPongMessageType] });
