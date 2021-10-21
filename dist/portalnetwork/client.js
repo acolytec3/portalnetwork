@@ -21,7 +21,7 @@ export class PortalNetwork extends EventEmitter {
     sendPing = async (dstId) => {
         const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) });
         const pingMsg = PingPongMessageType.serialize({
-            enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
+            enr_seq: this.client.enr.seq,
             custom_payload: payload
         });
         this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), StateNetworkId);
@@ -32,11 +32,13 @@ export class PortalNetwork extends EventEmitter {
             enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
             custom_payload: payload
         });
+        log('PONG payload ', Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]));
         this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]));
     };
     onTalkReq = async (srcId, sourceId, message) => {
-        log(`TALKREQUEST message received from ${srcId}`);
         const decoded = this.decodeMessage(message);
+        log(`TALKREQUEST message received from ${srcId}`);
+        console.log(message);
         if (decoded.type === MessageCodes.PING) {
             await this.sendPong(srcId, message.id);
         }

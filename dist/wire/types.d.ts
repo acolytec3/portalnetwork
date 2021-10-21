@@ -15,7 +15,7 @@ export declare enum MessageCodes {
     ACCEPT = 8
 }
 export interface PingMessage {
-    enr_seq: Uint8Array;
+    enr_seq: bigint;
     custom_payload: ByteVector;
 }
 export declare const PingPongMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;

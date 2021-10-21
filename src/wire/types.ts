@@ -20,13 +20,13 @@ export enum MessageCodes {
 }
 
 export interface PingMessage {
-    enr_seq: Uint8Array
+    enr_seq: bigint
     custom_payload: ByteVector
 }
 
 export const PingPongMessageType = new ContainerType({
     fields: {
-        enr_seq: new NumberUintType({ byteLength: 64 }),
+        enr_seq: new BigIntUintType({ byteLength: 8 }),
         custom_payload: new ByteVectorType({ length: 2048 })
     }
 })
@@ -36,7 +36,7 @@ export const MessageType = new UnionType({ types: [PingPongMessageType] })
 
 export const StateNetworkCustomDataType = new ContainerType({
     fields: {
-        data_radius: new BigIntUintType({ byteLength: 256 })
+        data_radius: new BigIntUintType({ byteLength: 32 })
     }
 })
 
