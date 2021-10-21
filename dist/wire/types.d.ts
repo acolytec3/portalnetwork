@@ -1,5 +1,5 @@
 import { ContainerType, ByteVector, UnionType } from "@chainsafe/ssz";
-export declare const StateNetworkId: Uint8Array;
+export declare const StateNetworkId = "0x500A";
 export declare const HistoryNetworkId: Uint8Array;
 export declare const TxGossipNetworkId: Uint8Array;
 export declare const HeaderGossipNetworkId: Uint8Array;

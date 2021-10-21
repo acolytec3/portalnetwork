@@ -4,6 +4,7 @@ import { EventEmitter } from 'events'
 
 import debug from 'debug'
 import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, StateNetworkId, } from "../wire/types";
+import { fromHexString } from "@chainsafe/ssz";
 
 const log = debug("portalnetwork")
 export class PortalNetwork extends EventEmitter {
@@ -28,7 +29,15 @@ export class PortalNetwork extends EventEmitter {
             enr_seq: this.client.enr.seq,
             custom_payload: payload
         })
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), StateNetworkId)
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), fromHexString(StateNetworkId))
+            .then((res) => {
+                if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.PONG) {
+                    log(`Received PONG from ${dstId.slice(0, 15)}... with response ${res.slice(2).toString()}`)
+                }
+            })
+            .catch((err) => {
+                log(`Error during PING request to ${dstId.slice(0, 15)}...: Error Message ${err.toString()}`)
+            })
         log(`Sending PING to ${dstId.slice(0, 15)}... for ${StateNetworkId} subnetwork`)
     }
 
@@ -42,7 +51,9 @@ export class PortalNetwork extends EventEmitter {
         this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
     }
     public onTalkReq = async (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
-
+        switch (message.protocol.toString('hex')) {
+            case StateNetworkId:
+        }
         const decoded = this.decodeMessage(message)
         log(`TALKREQUEST message received from ${srcId}`)
         console.log(message)
@@ -52,8 +63,7 @@ export class PortalNetwork extends EventEmitter {
     }
 
     public onTalkResp = (srcId: string, sourceId: ENR | null, message: ITalkRespMessage) => {
-        log(`TALKRESPONSE message received from ${srcId}, ${message}`)
-        console.log(message)
+        log(`TALKRESPONSE message received from ${srcId}, ${message.toString()}`)
     }
 
     private decodeMessage = (message: ITalkReqMessage | ITalkRespMessage): any => {

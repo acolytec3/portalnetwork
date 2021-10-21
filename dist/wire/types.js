@@ -1,6 +1,6 @@
 import { ContainerType, BigIntUintType, UnionType, NumberUintType, BasicListType } from "@chainsafe/ssz";
 // Subnetwork IDs
-export const StateNetworkId = Uint8Array.from([0x50, 0x0A]);
+export const StateNetworkId = '0x500A';
 export const HistoryNetworkId = Uint8Array.from([0x50, 0x0B]);
 export const TxGossipNetworkId = Uint8Array.from([0x50, 0x0C]);
 export const HeaderGossipNetworkId = Uint8Array.from([0x50, 0x0D]);
