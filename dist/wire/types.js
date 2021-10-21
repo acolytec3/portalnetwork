@@ -1,12 +1,11 @@
 import { ContainerType, ByteVectorType, BigIntUintType, UnionType, NumberUintType } from "@chainsafe/ssz";
-export var SubNetwork;
-(function (SubNetwork) {
-    SubNetwork["state"] = "0x500A";
-    SubNetwork["history"] = "0x500B";
-    SubNetwork["txGossip"] = "0x500C";
-    SubNetwork["headerGossip"] = "0x500D";
-    SubNetwork["canonIndices"] = "0X500E";
-})(SubNetwork || (SubNetwork = {}));
+// Subnetwork IDs
+export const StateNetworkId = Uint8Array.from([0x50, 0x0A]);
+export const HistoryNetworkId = Uint8Array.from([0x50, 0x0B]);
+export const TxGossipNetworkId = Uint8Array.from([0x50, 0x0C]);
+export const HeaderGossipNetworkId = Uint8Array.from([0x50, 0x0D]);
+export const CanonIndicesNetworkId = Uint8Array.from([0x50, 0x0E]);
+// Wire Protocol Message Codes
 export var MessageCodes;
 (function (MessageCodes) {
     MessageCodes[MessageCodes["PING"] = 1] = "PING";

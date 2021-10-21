@@ -1,13 +1,13 @@
-import { ContainerType, ByteVector, ByteVectorType, Number64UintType, BigIntUintType, UnionType, UintType, NumberUintType } from "@chainsafe/ssz";
+import { ContainerType, ByteVector, ByteVectorType, BigIntUintType, UnionType, NumberUintType } from "@chainsafe/ssz";
 
-export enum SubNetwork {
-    state = '0x500A',
-    history = '0x500B',
-    txGossip = '0x500C',
-    headerGossip = '0x500D',
-    canonIndices = '0X500E'
-}
+// Subnetwork IDs
+export const StateNetworkId = Uint8Array.from([0x50, 0x0A])
+export const HistoryNetworkId = Uint8Array.from([0x50, 0x0B])
+export const TxGossipNetworkId = Uint8Array.from([0x50, 0x0C])
+export const HeaderGossipNetworkId = Uint8Array.from([0x50, 0x0D])
+export const CanonIndicesNetworkId = Uint8Array.from([0x50, 0x0E])
 
+// Wire Protocol Message Codes
 export enum MessageCodes {
     PING = 0x01,
     PONG = 0x02,

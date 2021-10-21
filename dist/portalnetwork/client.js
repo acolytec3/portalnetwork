@@ -1,7 +1,7 @@
 import { Discv5 } from "@chainsafe/discv5";
 import { EventEmitter } from 'events';
 import debug from 'debug';
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetwork } from "../wire/types";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, StateNetworkId, } from "../wire/types";
 const log = debug("portalnetwork");
 export class PortalNetwork extends EventEmitter {
     client;
@@ -23,7 +23,7 @@ export class PortalNetwork extends EventEmitter {
             enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
             custom_payload: payload
         });
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), SubNetwork.state);
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), StateNetworkId);
     };
     onTalkReq = (srcId, sourceId, message) => {
         log(`TALKREQUEST message received from ${srcId}`);

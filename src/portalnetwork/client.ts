@@ -3,7 +3,7 @@ import { ITalkReqMessage, ITalkRespMessage } from "@chainsafe/discv5/lib/message
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageType as PortalNetworkMessageType, MessageCodes, SubNetwork } from "../wire/types";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, StateNetworkId, } from "../wire/types";
 
 const log = debug("portalnetwork")
 export class PortalNetwork extends EventEmitter {
@@ -28,7 +28,7 @@ export class PortalNetwork extends EventEmitter {
             enr_seq: Buffer.from(this.client.enr.seq.toString()).buffer,
             custom_payload: payload
         })
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), SubNetwork.state)
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), StateNetworkId)
     }
 
     public onTalkReq = (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {

@@ -1,11 +1,9 @@
 import { ContainerType, ByteVector, UnionType } from "@chainsafe/ssz";
-export declare enum SubNetwork {
-    state = "0x500A",
-    history = "0x500B",
-    txGossip = "0x500C",
-    headerGossip = "0x500D",
-    canonIndices = "0X500E"
-}
+export declare const StateNetworkId: Uint8Array;
+export declare const HistoryNetworkId: Uint8Array;
+export declare const TxGossipNetworkId: Uint8Array;
+export declare const HeaderGossipNetworkId: Uint8Array;
+export declare const CanonIndicesNetworkId: Uint8Array;
 export declare enum MessageCodes {
     PING = 1,
     PONG = 2,
