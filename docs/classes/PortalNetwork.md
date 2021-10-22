@@ -16,7 +16,7 @@
 
 ### Properties
 
-- [discv5](PortalNetwork.md#discv5)
+- [client](PortalNetwork.md#client)
 - [captureRejectionSymbol](PortalNetwork.md#capturerejectionsymbol)
 - [captureRejections](PortalNetwork.md#capturerejections)
 - [defaultMaxListeners](PortalNetwork.md#defaultmaxlisteners)
@@ -25,20 +25,27 @@
 ### Methods
 
 - [addListener](PortalNetwork.md#addlistener)
+- [decodeMessage](PortalNetwork.md#decodemessage)
 - [emit](PortalNetwork.md#emit)
+- [enableLog](PortalNetwork.md#enablelog)
 - [eventNames](PortalNetwork.md#eventnames)
 - [getMaxListeners](PortalNetwork.md#getmaxlisteners)
 - [listenerCount](PortalNetwork.md#listenercount)
 - [listeners](PortalNetwork.md#listeners)
 - [off](PortalNetwork.md#off)
 - [on](PortalNetwork.md#on)
+- [onTalkReq](PortalNetwork.md#ontalkreq)
+- [onTalkResp](PortalNetwork.md#ontalkresp)
 - [once](PortalNetwork.md#once)
 - [prependListener](PortalNetwork.md#prependlistener)
 - [prependOnceListener](PortalNetwork.md#prependoncelistener)
 - [rawListeners](PortalNetwork.md#rawlisteners)
 - [removeAllListeners](PortalNetwork.md#removealllisteners)
 - [removeListener](PortalNetwork.md#removelistener)
+- [sendPing](PortalNetwork.md#sendping)
+- [sendPong](PortalNetwork.md#sendpong)
 - [setMaxListeners](PortalNetwork.md#setmaxlisteners)
+- [start](PortalNetwork.md#start)
 - [getEventListeners](PortalNetwork.md#geteventlisteners)
 - [listenerCount](PortalNetwork.md#listenercount)
 - [on](PortalNetwork.md#on)
@@ -62,17 +69,17 @@ EventEmitter.constructor
 
 #### Defined in
 
-src/portalnetwork/client.ts:7
+[src/portalnetwork/client.ts:13](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L13)
 
 ## Properties
 
-### discv5
+### client
 
-• **discv5**: `Discv5`
+• **client**: `Discv5`
 
 #### Defined in
 
-src/portalnetwork/client.ts:5
+[src/portalnetwork/client.ts:11](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L11)
 
 ___
 
@@ -171,6 +178,26 @@ node_modules/@types/node/events.d.ts:299
 
 ___
 
+### decodeMessage
+
+▸ `Private` **decodeMessage**(`message`): `any`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `message` | `ITalkReqMessage` \| `ITalkRespMessage` |
+
+#### Returns
+
+`any`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:69](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L69)
+
+___
+
 ### emit
 
 ▸ **emit**(`eventName`, ...`args`): `boolean`
@@ -233,6 +260,26 @@ EventEmitter.emit
 #### Defined in
 
 node_modules/@types/node/events.d.ts:555
+
+___
+
+### enableLog
+
+▸ **enableLog**(`namespaces?`): `void`
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `namespaces` | `string` | `"portalnetwork*,discv5*"` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:23](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L23)
 
 ___
 
@@ -438,6 +485,50 @@ EventEmitter.on
 #### Defined in
 
 node_modules/@types/node/events.d.ts:330
+
+___
+
+### onTalkReq
+
+▸ **onTalkReq**(`srcId`, `sourceId`, `message`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `srcId` | `string` |
+| `sourceId` | ``null`` \| `ENR` |
+| `message` | `ITalkReqMessage` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[src/portalnetwork/client.ts:53](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L53)
+
+___
+
+### onTalkResp
+
+▸ **onTalkResp**(`srcId`, `sourceId`, `message`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `srcId` | `string` |
+| `sourceId` | ``null`` \| `ENR` |
+| `message` | `ITalkRespMessage` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:65](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L65)
 
 ___
 
@@ -761,6 +852,47 @@ node_modules/@types/node/events.d.ts:439
 
 ___
 
+### sendPing
+
+▸ **sendPing**(`dstId`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `dstId` | `string` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[src/portalnetwork/client.ts:26](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L26)
+
+___
+
+### sendPong
+
+▸ `Private` **sendPong**(`srcId`, `reqId`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `srcId` | `string` |
+| `reqId` | `bigint` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[src/portalnetwork/client.ts:44](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L44)
+
+___
+
 ### setMaxListeners
 
 ▸ **setMaxListeners**(`n`): [`PortalNetwork`](PortalNetwork.md)
@@ -791,6 +923,20 @@ EventEmitter.setMaxListeners
 #### Defined in
 
 node_modules/@types/node/events.d.ts:465
+
+___
+
+### start
+
+▸ **start**(): `Promise`<`void`\>
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[src/portalnetwork/client.ts:20](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L20)
 
 ___
 
