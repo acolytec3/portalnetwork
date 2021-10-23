@@ -3,10 +3,15 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PortalWireMessageType, } from "../wire/types";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, } from "../wire/types";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 
 const log = debug("portalnetwork")
+
+type MessageProps = {
+    type: Number,
+    body: PingMessage | undefined
+}
 export class PortalNetwork extends EventEmitter {
     client: Discv5;
 
@@ -74,6 +79,8 @@ export class PortalNetwork extends EventEmitter {
             default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
         }
         const decoded = this.decodeMessage(message)
+        console.log(decoded.type)
+        console.log(decoded.type === MessageCodes.PING)
         log(`TALKREQUEST message received from ${srcId}`)
         switch (decoded.type) {
             case MessageCodes.PING: this.sendPong(srcId, message.id); break;
@@ -92,11 +99,16 @@ export class PortalNetwork extends EventEmitter {
         log(`TALKRESPONSE message received from ${srcId}, ${message.toString()}`)
     }
 
-    private decodeMessage = (message: ITalkReqMessage | ITalkRespMessage): any => {
+    private decodeMessage = (message: ITalkReqMessage | ITalkRespMessage): MessageProps => {
         if (message.type === MessageType.TALKREQ) {
             return {
-                type: MessageCodes[parseInt(message.request.slice(0, 1).toString('hex'))],
-                body: PingPongMessageType.deserialize(message.request.slice(1))
+                type: parseInt(message.request.slice(0, 1).toString('hex')),
+                body: PingPongMessageType.deserialize(message.request.slice(1)) as PingMessage
+            }
+        } else {
+            return {
+                type: 0,
+                body: undefined
             }
         }
     }

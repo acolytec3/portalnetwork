@@ -70,6 +70,8 @@ export class PortalNetwork extends EventEmitter {
                 return;
         }
         const decoded = this.decodeMessage(message);
+        console.log(decoded.type);
+        console.log(decoded.type === MessageCodes.PING);
         log(`TALKREQUEST message received from ${srcId}`);
         switch (decoded.type) {
             case MessageCodes.PING:
@@ -105,8 +107,14 @@ export class PortalNetwork extends EventEmitter {
     decodeMessage = (message) => {
         if (message.type === MessageType.TALKREQ) {
             return {
-                type: MessageCodes[parseInt(message.request.slice(0, 1).toString('hex'))],
+                type: parseInt(message.request.slice(0, 1).toString('hex')),
                 body: PingPongMessageType.deserialize(message.request.slice(1))
+            };
+        }
+        else {
+            return {
+                type: 0,
+                body: undefined
             };
         }
     };
