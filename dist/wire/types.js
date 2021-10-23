@@ -1,10 +1,10 @@
 import { ContainerType, BigIntUintType, UnionType, NumberUintType, BasicListType } from "@chainsafe/ssz";
 // Subnetwork IDs
-export const StateNetworkId = '0x500A';
-export const HistoryNetworkId = Uint8Array.from([0x50, 0x0B]);
-export const TxGossipNetworkId = Uint8Array.from([0x50, 0x0C]);
-export const HeaderGossipNetworkId = Uint8Array.from([0x50, 0x0D]);
-export const CanonIndicesNetworkId = Uint8Array.from([0x50, 0x0E]);
+export const StateNetworkId = '500a';
+export const HistoryNetworkId = '500b';
+export const TxGossipNetworkId = '500c';
+export const HeaderGossipNetworkId = '500d';
+export const CanonIndicesNetworkId = '500e';
 // Wire Protocol Message Codes
 export var MessageCodes;
 (function (MessageCodes) {

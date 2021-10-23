@@ -32,11 +32,13 @@ export class PortalNetwork extends EventEmitter {
         this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), fromHexString(StateNetworkId))
             .then((res) => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.PONG) {
-                    log(`Received PONG from ${dstId.slice(0, 15)}... with response ${res.slice(2).toString()}`)
+                    log(`Received PONG from ${dstId.slice(0, 15)}...`)
+                    const decoded = PingPongMessageType.deserialize(res.slice(1))
+                    log(decoded)
                 }
             })
             .catch((err) => {
-                log(`Error during PING request to ${dstId.slice(0, 15)}...: Error Message ${err.toString()}`)
+                log(`Error during PING request to ${dstId.slice(0, 15)}...: ${err.toString()}`)
             })
         log(`Sending PING to ${dstId.slice(0, 15)}... for ${StateNetworkId} subnetwork`)
     }
@@ -50,9 +52,11 @@ export class PortalNetwork extends EventEmitter {
         log('PONG payload ', Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
         this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
     }
+
     public onTalkReq = async (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
         switch (message.protocol.toString('hex')) {
-            case StateNetworkId:
+            case StateNetworkId: log(`Received State Subnetwork request`); break;
+            default: log(`Received TALKREQ message on unsupported protocol ${message.protocol.toString('hex')}`); return;
         }
         const decoded = this.decodeMessage(message)
         log(`TALKREQUEST message received from ${srcId}`)
