@@ -30,6 +30,9 @@
 - [enableLog](PortalNetwork.md#enablelog)
 - [eventNames](PortalNetwork.md#eventnames)
 - [getMaxListeners](PortalNetwork.md#getmaxlisteners)
+- [handleFindContent](PortalNetwork.md#handlefindcontent)
+- [handleFindNodes](PortalNetwork.md#handlefindnodes)
+- [handleOffer](PortalNetwork.md#handleoffer)
 - [listenerCount](PortalNetwork.md#listenercount)
 - [listeners](PortalNetwork.md#listeners)
 - [off](PortalNetwork.md#off)
@@ -69,7 +72,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:13](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L13)
+[src/portalnetwork/client.ts:13](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L13)
 
 ## Properties
 
@@ -79,7 +82,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:11](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L11)
+[src/portalnetwork/client.ts:11](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L11)
 
 ___
 
@@ -194,7 +197,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:69](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L69)
+[src/portalnetwork/client.ts:95](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L95)
 
 ___
 
@@ -269,9 +272,9 @@ ___
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `namespaces` | `string` | `"portalnetwork*,discv5*"` |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `namespaces` | `string` | `"portalnetwork*,discv5*"` | comma separated list of logging namespaces defaults to "portalnetwork*, discv5*" |
 
 #### Returns
 
@@ -279,7 +282,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:23](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L23)
+[src/portalnetwork/client.ts:32](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L32)
 
 ___
 
@@ -339,6 +342,66 @@ EventEmitter.getMaxListeners
 #### Defined in
 
 node_modules/@types/node/events.d.ts:471
+
+___
+
+### handleFindContent
+
+▸ `Private` **handleFindContent**(`body`): `never`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `body` | `any` |
+
+#### Returns
+
+`never`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:112](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L112)
+
+___
+
+### handleFindNodes
+
+▸ `Private` **handleFindNodes**(`body`): `never`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `body` | `any` |
+
+#### Returns
+
+`never`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:104](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L104)
+
+___
+
+### handleOffer
+
+▸ `Private` **handleOffer**(`body`): `never`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `body` | `any` |
+
+#### Returns
+
+`never`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:108](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L108)
 
 ___
 
@@ -490,7 +553,7 @@ ___
 
 ### onTalkReq
 
-▸ **onTalkReq**(`srcId`, `sourceId`, `message`): `Promise`<`void`\>
+▸ `Private` **onTalkReq**(`srcId`, `sourceId`, `message`): `Promise`<`void`\>
 
 #### Parameters
 
@@ -506,13 +569,13 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:53](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L53)
+[src/portalnetwork/client.ts:71](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L71)
 
 ___
 
 ### onTalkResp
 
-▸ **onTalkResp**(`srcId`, `sourceId`, `message`): `void`
+▸ `Private` **onTalkResp**(`srcId`, `sourceId`, `message`): `void`
 
 #### Parameters
 
@@ -528,7 +591,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:65](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L65)
+[src/portalnetwork/client.ts:91](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L91)
 
 ___
 
@@ -854,21 +917,23 @@ ___
 
 ### sendPing
 
-▸ **sendPing**(`dstId`): `Promise`<`void`\>
+▸ **sendPing**(`dstId`): `void`
+
+Sends a Portal Network Wire Protocol PING message to a specified node
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `dstId` | `string` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `dstId` | `string` | the nodeId of the peer to send a ping to |
 
 #### Returns
 
-`Promise`<`void`\>
+`void`
 
 #### Defined in
 
-[src/portalnetwork/client.ts:26](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L26)
+[src/portalnetwork/client.ts:41](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L41)
 
 ___
 
@@ -889,7 +954,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:44](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L44)
+[src/portalnetwork/client.ts:61](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L61)
 
 ___
 
@@ -930,13 +995,15 @@ ___
 
 ▸ **start**(): `Promise`<`void`\>
 
+Starts the portal network client
+
 #### Returns
 
 `Promise`<`void`\>
 
 #### Defined in
 
-[src/portalnetwork/client.ts:20](https://github.com/acolytec3/portalnetwork/blob/94f15f8/src/portalnetwork/client.ts#L20)
+[src/portalnetwork/client.ts:23](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L23)
 
 ___
 

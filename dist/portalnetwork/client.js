@@ -2,7 +2,7 @@ import { Discv5 } from "@chainsafe/discv5";
 import { MessageType } from "@chainsafe/discv5/lib/message";
 import { EventEmitter } from 'events';
 import debug from 'debug';
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, StateNetworkId, } from "../wire/types";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, StateNetworkId, PortalWireMessageType, } from "../wire/types";
 import { fromHexString } from "@chainsafe/ssz";
 const log = debug("portalnetwork");
 export class PortalNetwork extends EventEmitter {
@@ -13,13 +13,26 @@ export class PortalNetwork extends EventEmitter {
         this.client.on("talkReqReceived", this.onTalkReq);
         this.client.on("talkRespReceived", this.onTalkResp);
     }
+    /**
+     * Starts the portal network client
+     */
     start = async () => {
         await this.client.start();
     };
+    /**
+     *
+     * @param namespaces comma separated list of logging namespaces
+     * defaults to "portalnetwork*, discv5*"
+     */
     enableLog = (namespaces = "portalnetwork*,discv5*") => {
         debug.enable(namespaces);
     };
-    sendPing = async (dstId) => {
+    /**
+     *
+     * Sends a Portal Network Wire Protocol PING message to a specified node
+     * @param dstId the nodeId of the peer to send a ping to
+     */
+    sendPing = (dstId) => {
         const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) });
         const pingMsg = PingPongMessageType.serialize({
             enr_seq: this.client.enr.seq,
@@ -58,9 +71,32 @@ export class PortalNetwork extends EventEmitter {
         }
         const decoded = this.decodeMessage(message);
         log(`TALKREQUEST message received from ${srcId}`);
-        console.log(message);
-        if (decoded.type === MessageCodes.PING) {
-            await this.sendPong(srcId, message.id);
+        switch (decoded.type) {
+            case MessageCodes.PING:
+                this.sendPong(srcId, message.id);
+                break;
+            case MessageCodes.PONG:
+                log(`PONG message not expected in TALKREQ`);
+                break;
+            case MessageCodes.FINDNODES:
+                this.handleFindNodes(decoded.body);
+                break;
+            case MessageCodes.NODES:
+                log(`NODES message not expected in TALKREQ`);
+                break;
+            case MessageCodes.FINDCONTENT:
+                this.handleFindContent(decoded.body);
+                break;
+            case MessageCodes.CONTENT:
+                log(`CONTENT message not expected in TALKREQ`);
+                break;
+            case MessageCodes.OFFER:
+                this.handleOffer(decoded.body);
+                break;
+            case MessageCodes.ACCEPT:
+                log(`ACCEPT message not expected in TALKREQ`);
+                break;
+            default: log(`Unrecognized message type received`);
         }
     };
     onTalkResp = (srcId, sourceId, message) => {
@@ -69,9 +105,18 @@ export class PortalNetwork extends EventEmitter {
     decodeMessage = (message) => {
         if (message.type === MessageType.TALKREQ) {
             return {
-                type: parseInt(message.request.slice(0, 1).toString('hex')),
-                body: message.request.slice(2)
+                type: MessageCodes[parseInt(message.request.slice(0, 1).toString('hex'))],
+                body: PortalWireMessageType.deserialize(message.request.slice(1))
             };
         }
+    };
+    handleFindNodes = (body) => {
+        throw new Error("Method not implemented.");
+    };
+    handleOffer = (body) => {
+        throw new Error("Method not implemented.");
+    };
+    handleFindContent = (body) => {
+        throw new Error("Method not implemented.");
     };
 }

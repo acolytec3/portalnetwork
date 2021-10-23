@@ -23,7 +23,7 @@ export const PingPongMessageType = new ContainerType({
         custom_payload: new BasicListType({ limit: 2048, elementType: new NumberUintType({ byteLength: 1 }) })
     }
 });
-export const MessageType = new UnionType({ types: [PingPongMessageType] });
+export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType] });
 export const StateNetworkCustomDataType = new ContainerType({
     fields: {
         data_radius: new BigIntUintType({ byteLength: 32 })

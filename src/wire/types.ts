@@ -32,7 +32,7 @@ export const PingPongMessageType = new ContainerType({
 })
 
 
-export const MessageType = new UnionType({ types: [PingPongMessageType] })
+export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType] })
 
 export const StateNetworkCustomDataType = new ContainerType({
     fields: {

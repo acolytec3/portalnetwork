@@ -19,6 +19,6 @@ export interface PingMessage {
     custom_payload: ByteVector;
 }
 export declare const PingPongMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export declare const MessageType: UnionType<import("@chainsafe/ssz").Union<unknown>>;
+export declare const PortalWireMessageType: UnionType<import("@chainsafe/ssz").Union<unknown>>;
 export declare const StateNetworkCustomDataType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 //# sourceMappingURL=types.d.ts.map
