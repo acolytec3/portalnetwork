@@ -79,8 +79,6 @@ export class PortalNetwork extends EventEmitter {
             default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
         }
         const decoded = this.decodeMessage(message)
-        console.log(decoded.type)
-        console.log(decoded.type === MessageCodes.PING)
         log(`TALKREQUEST message received from ${srcId}`)
         switch (decoded.type) {
             case MessageCodes.PING: this.sendPong(srcId, message.id); break;

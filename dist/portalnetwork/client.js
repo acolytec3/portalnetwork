@@ -70,8 +70,6 @@ export class PortalNetwork extends EventEmitter {
                 return;
         }
         const decoded = this.decodeMessage(message);
-        console.log(decoded.type);
-        console.log(decoded.type === MessageCodes.PING);
         log(`TALKREQUEST message received from ${srcId}`);
         switch (decoded.type) {
             case MessageCodes.PING:
