@@ -1,10 +1,10 @@
-import { Discv5, ENR, IDiscv5CreateOptions } from "@chainsafe/discv5";
+import { Discv5, ENR, fromHex, IDiscv5CreateOptions } from "@chainsafe/discv5";
 import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv5/lib/message";
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, StateNetworkId, PortalWireMessageType, } from "../wire/types";
-import { fromHexString } from "@chainsafe/ssz";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PortalWireMessageType, } from "../wire/types";
+import { fromHexString, toHexString } from "@chainsafe/ssz";
 
 const log = debug("portalnetwork")
 export class PortalNetwork extends EventEmitter {
@@ -44,7 +44,7 @@ export class PortalNetwork extends EventEmitter {
             enr_seq: this.client.enr.seq,
             custom_payload: payload
         })
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), fromHexString(StateNetworkId))
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), fromHexString(SubNetworkIds.StateNetworkId))
             .then((res) => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.PONG) {
                     log(`Received PONG from ${dstId.slice(0, 15)}...`)
@@ -55,7 +55,7 @@ export class PortalNetwork extends EventEmitter {
             .catch((err) => {
                 log(`Error during PING request to ${dstId.slice(0, 15)}...: ${err.toString()}`)
             })
-        log(`Sending PING to ${dstId.slice(0, 15)}... for ${StateNetworkId} subnetwork`)
+        log(`Sending PING to ${dstId.slice(0, 15)}... for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
@@ -69,9 +69,9 @@ export class PortalNetwork extends EventEmitter {
     }
 
     private onTalkReq = async (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
-        switch (message.protocol.toString('hex')) {
-            case StateNetworkId: log(`Received State Subnetwork request`); break;
-            default: log(`Received TALKREQ message on unsupported protocol ${message.protocol.toString('hex')}`); return;
+        switch (toHexString(message.protocol)) {
+            case SubNetworkIds.StateNetworkId: log(`Received State Subnetwork request`); break;
+            default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
         }
         const decoded = this.decodeMessage(message)
         log(`TALKREQUEST message received from ${srcId}`)
@@ -96,7 +96,7 @@ export class PortalNetwork extends EventEmitter {
         if (message.type === MessageType.TALKREQ) {
             return {
                 type: MessageCodes[parseInt(message.request.slice(0, 1).toString('hex'))],
-                body: PortalWireMessageType.deserialize(message.request.slice(1))
+                body: PingPongMessageType.deserialize(message.request.slice(1))
             }
         }
     }

@@ -1,11 +1,13 @@
-import { ContainerType, ByteVector, ByteVectorType, BigIntUintType, UnionType, NumberUintType, BasicVectorType, BasicListType, NUMBER_UINT_TYPE } from "@chainsafe/ssz";
+import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType } from "@chainsafe/ssz";
 
 // Subnetwork IDs
-export const StateNetworkId = '500a'
-export const HistoryNetworkId = '500b'
-export const TxGossipNetworkId = '500c'
-export const HeaderGossipNetworkId = '500d'
-export const CanonIndicesNetworkId = '500e'
+export enum SubNetworkIds {
+    StateNetworkId = '0x500a',
+    HistoryNetworkId = '0x500b',
+    TxGossipNetworkId = '0x500c',
+    HeaderGossipNetworkId = '0x500d',
+    CanonIndicesNetworkId = '0x500e',
+}
 
 // Wire Protocol Message Codes
 export enum MessageCodes {
@@ -27,7 +29,7 @@ export interface PingMessage {
 export const PingPongMessageType = new ContainerType({
     fields: {
         enr_seq: new BigIntUintType({ byteLength: 8 }),
-        custom_payload: new BasicListType({ limit: 2048, elementType: new NumberUintType({ byteLength: 1 }) })
+        custom_payload: new ListType({ limit: 2048, elementType: byteType })
     }
 })
 
