@@ -23,4 +23,8 @@ export interface PingMessage {
 export declare const PingPongMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 export declare const PortalWireMessageType: UnionType<import("@chainsafe/ssz").Union<unknown>>;
 export declare const StateNetworkCustomDataType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
+export interface FindNodesMessage {
+    distances: Uint16Array;
+}
+export declare const FindNodesMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 //# sourceMappingURL=types.d.ts.map

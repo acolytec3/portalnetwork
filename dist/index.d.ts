@@ -1,3 +1,3 @@
 export { PortalNetwork } from './portalnetwork/index';
-export { OverlayRoutingTable, distance } from './dht/index';
+export { StateNetworkRoutingTable, distance } from './dht/index';
 //# sourceMappingURL=index.d.ts.map

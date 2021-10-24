@@ -3,8 +3,9 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, } from "../wire/types";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, } from "../wire/types";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
+import { StateNetworkRoutingTable } from "..";
 
 const log = debug("portalnetwork")
 
@@ -14,10 +15,12 @@ type MessageProps = {
 }
 export class PortalNetwork extends EventEmitter {
     client: Discv5;
+    stateNetworkRoutingTable: StateNetworkRoutingTable;
 
     constructor(config: IDiscv5CreateOptions) {
         super();
         this.client = Discv5.create(config)
+        this.stateNetworkRoutingTable = new StateNetworkRoutingTable(this.client.enr.nodeId, 5)
         this.client.on("talkReqReceived", this.onTalkReq)
         this.client.on("talkRespReceived", this.onTalkResp)
     }
@@ -63,6 +66,13 @@ export class PortalNetwork extends EventEmitter {
         log(`Sending PING to ${dstId.slice(0, 15)}... for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
+    public sendFindNodes = (dstId: string, distances: Uint16Array) => {
+        const findNodesMsg: FindNodesMessage = { distances: distances }
+        const payload = FindNodesMessageType.serialize({ findNodesMsg })
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.FINDNODES]), Buffer.from(payload)]), fromHexString(SubNetworkIds.StateNetworkId))
+            .then(res => console.log(res))
+    }
+
     private sendPong = async (srcId: string, reqId: bigint) => {
         const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) })
         const pongMsg = PingPongMessageType.serialize({
@@ -71,6 +81,7 @@ export class PortalNetwork extends EventEmitter {
         })
         log('PONG payload ', Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
         this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
+        const peerENR = this.client.getKadValue(srcId);
     }
 
     private onTalkReq = async (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
@@ -78,10 +89,10 @@ export class PortalNetwork extends EventEmitter {
             case SubNetworkIds.StateNetworkId: log(`Received State Subnetwork request`); break;
             default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
         }
-        const decoded = this.decodeMessage(message)
+        const decoded = this.decodeMessage(message);
         log(`TALKREQUEST message received from ${srcId}`)
         switch (decoded.type) {
-            case MessageCodes.PING: this.sendPong(srcId, message.id); break;
+            case MessageCodes.PING: this.handlePing(srcId, message); break;
             case MessageCodes.PONG: log(`PONG message not expected in TALKREQ`); break;
             case MessageCodes.FINDNODES: this.handleFindNodes(decoded.body); break;
             case MessageCodes.NODES: log(`NODES message not expected in TALKREQ`); break;
@@ -109,6 +120,17 @@ export class PortalNetwork extends EventEmitter {
                 body: undefined
             }
         }
+    }
+
+    private handlePing = (srcId: string, message: ITalkReqMessage) => {
+        // Check to see if node is already in state network routing table and add if not
+        if (!this.stateNetworkRoutingTable.getValue(srcId)) {
+            const enr = this.client.getKadValue(srcId);
+            if (enr) {
+                this.stateNetworkRoutingTable.add(enr);
+            }
+        }
+        this.sendPong(srcId, message.id);
     }
 
     private handleFindNodes = (body: any) => {

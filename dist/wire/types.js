@@ -1,4 +1,4 @@
-import { ContainerType, BigIntUintType, UnionType, ListType, byteType } from "@chainsafe/ssz";
+import { ContainerType, BigIntUintType, UnionType, ListType, byteType, NumberUintType } from "@chainsafe/ssz";
 // Subnetwork IDs
 export var SubNetworkIds;
 (function (SubNetworkIds) {
@@ -30,5 +30,10 @@ export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType
 export const StateNetworkCustomDataType = new ContainerType({
     fields: {
         data_radius: new BigIntUintType({ byteLength: 32 })
+    }
+});
+export const FindNodesMessageType = new ContainerType({
+    fields: {
+        distances: new ListType({ limit: 256, elementType: new NumberUintType({ byteLength: 2 }) })
     }
 });

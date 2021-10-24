@@ -1,6 +1,6 @@
 import { KademliaRoutingTable } from '@chainsafe/discv5';
 import { distance } from './util';
-export class OverlayRoutingTable extends KademliaRoutingTable {
+export class StateNetworkRoutingTable extends KademliaRoutingTable {
     /**
      *
      * @param id id of node to find nearest nodes to

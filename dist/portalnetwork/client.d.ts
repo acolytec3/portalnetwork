@@ -1,8 +1,10 @@
 /// <reference types="node" />
 import { Discv5, IDiscv5CreateOptions } from "@chainsafe/discv5";
 import { EventEmitter } from 'events';
+import { StateNetworkRoutingTable } from "..";
 export declare class PortalNetwork extends EventEmitter {
     client: Discv5;
+    stateNetworkRoutingTable: StateNetworkRoutingTable;
     constructor(config: IDiscv5CreateOptions);
     /**
      * Starts the portal network client
@@ -20,10 +22,12 @@ export declare class PortalNetwork extends EventEmitter {
      * @param dstId the nodeId of the peer to send a ping to
      */
     sendPing: (dstId: string) => void;
+    sendFindNodes: (dstId: string, distances: Uint16Array) => void;
     private sendPong;
     private onTalkReq;
     private onTalkResp;
     private decodeMessage;
+    private handlePing;
     private handleFindNodes;
     private handleOffer;
     private handleFindContent;
