@@ -10,7 +10,7 @@ export const distance = (id1, id2) => {
     const num1 = new BN(id1);
     const num2 = new BN(id2);
     let diff;
-    num1.gt(num2) ? diff = num1.sub(num2) : diff = num2.sub(num1);
-    diff.gt(MID) ? diff = MODULO.sub(diff) : diff;
+    diff = num1.gt(num2) ? num1.sub(num2) :  num2.sub(num1);
+    diff = diff.gt(MID) ? MODULO.sub(diff) : diff;
     return diff;
 };

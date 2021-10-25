@@ -22,18 +22,18 @@ export var MessageCodes;
 })(MessageCodes || (MessageCodes = {}));
 export const PingPongMessageType = new ContainerType({
     fields: {
-        enr_seq: new BigIntUintType({ byteLength: 8 }),
-        custom_payload: new ListType({ limit: 2048, elementType: byteType })
+        enr_seq: BigIntUintType({ byteLength: 8 }),
+        custom_payload: ListType({ limit: 2048, elementType: byteType })
     }
 });
 export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType] });
 export const StateNetworkCustomDataType = new ContainerType({
     fields: {
-        data_radius: new BigIntUintType({ byteLength: 32 })
+        data_radius: BigIntUintType({ byteLength: 32 })
     }
 });
 export const FindNodesMessageType = new ContainerType({
     fields: {
-        distances: new ListType({ limit: 256, elementType: new NumberUintType({ byteLength: 2 }) })
+        distances: ListType({ limit: 256, elementType: NumberUintType({ byteLength: 2 }) })
     }
 });
