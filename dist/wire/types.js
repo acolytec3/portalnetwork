@@ -34,6 +34,6 @@ export const StateNetworkCustomDataType = new ContainerType({
 });
 export const FindNodesMessageType = new ContainerType({
     fields: {
-        distances: new ListType({ limit: 256, elementType: new NumberUintType({ byteLength: 2 }) })
+        distances: new ListType({ elementType: new NumberUintType({ byteLength: 2 }), limit: 256 })
     }
 });

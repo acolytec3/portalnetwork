@@ -68,7 +68,7 @@ export class PortalNetwork extends EventEmitter {
 
     public sendFindNodes = (dstId: string, distances: Uint16Array) => {
         const findNodesMsg: FindNodesMessage = { distances: distances }
-        const payload = FindNodesMessageType.serialize({ findNodesMsg })
+        const payload = FindNodesMessageType.serialize(findNodesMsg)
         this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.FINDNODES]), Buffer.from(payload)]), fromHexString(SubNetworkIds.StateNetworkId))
             .then(res => console.log(res))
     }
