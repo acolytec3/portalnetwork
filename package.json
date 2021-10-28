@@ -13,7 +13,7 @@
   "author": "acolytec3",
   "license": "MIT",
   "dependencies": {
-    "@chainsafe/discv5": "github:acolytec3/discv5#90c54ae4dbf11a5124d645581079e2bfabfb3e87",
+    "@chainsafe/discv5": "github:acolytec3/discv5#9b38568381bd02d0733e9cc8304ea50ed75130b6",
     "@chainsafe/ssz": "^0.8.19",
     "@types/bn.js": "^5.1.0",
     "bn.js": "^5.2.0",
