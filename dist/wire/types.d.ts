@@ -1,4 +1,4 @@
-import { ContainerType, ByteVector, UnionType } from "@chainsafe/ssz";
+import { ContainerType, ByteVector, UnionType, ListType } from "@chainsafe/ssz";
 export declare enum SubNetworkIds {
     StateNetworkId = "0x500a",
     HistoryNetworkId = "0x500b",
@@ -16,9 +16,10 @@ export declare enum MessageCodes {
     OFFER = 7,
     ACCEPT = 8
 }
+export declare const ByteList: ListType<import("@chainsafe/ssz").List<any>>;
 export interface PingMessage {
-    enr_seq: bigint;
-    custom_payload: ByteVector;
+    enrSeq: bigint;
+    customPayload: ByteVector;
 }
 export declare const PingPongMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 export declare const PortalWireMessageType: UnionType<import("@chainsafe/ssz").Union<unknown>>;
@@ -27,4 +28,9 @@ export interface FindNodesMessage {
     distances: Uint16Array;
 }
 export declare const FindNodesMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
+export interface NodesMessage {
+    total: Number;
+    enrs: Uint8Array[];
+}
+export declare const NodesMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 //# sourceMappingURL=types.d.ts.map

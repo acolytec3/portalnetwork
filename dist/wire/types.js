@@ -20,20 +20,27 @@ export var MessageCodes;
     MessageCodes[MessageCodes["OFFER"] = 7] = "OFFER";
     MessageCodes[MessageCodes["ACCEPT"] = 8] = "ACCEPT";
 })(MessageCodes || (MessageCodes = {}));
+export const ByteList = new ListType({ limit: 2048, elementType: byteType });
 export const PingPongMessageType = new ContainerType({
     fields: {
-        enr_seq: new BigIntUintType({ byteLength: 8 }),
-        custom_payload: new ListType({ limit: 2048, elementType: byteType })
+        enrSeq: new BigIntUintType({ byteLength: 8 }),
+        customPayload: ByteList
     }
 });
 export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType] });
 export const StateNetworkCustomDataType = new ContainerType({
     fields: {
-        data_radius: new BigIntUintType({ byteLength: 32 })
+        dataRadius: new BigIntUintType({ byteLength: 32 })
     }
 });
 export const FindNodesMessageType = new ContainerType({
     fields: {
         distances: new ListType({ elementType: new NumberUintType({ byteLength: 2 }), limit: 256 })
+    }
+});
+export const NodesMessageType = new ContainerType({
+    fields: {
+        total: byteType,
+        enrs: new ListType({ elementType: ByteList, limit: 32 })
     }
 });

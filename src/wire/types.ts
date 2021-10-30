@@ -1,4 +1,5 @@
-import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType, BasicListType } from "@chainsafe/ssz";
+import { ENR } from "@chainsafe/discv5";
+import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType } from "@chainsafe/ssz";
 
 // Subnetwork IDs
 export enum SubNetworkIds {
@@ -21,15 +22,16 @@ export enum MessageCodes {
     ACCEPT = 0x08
 }
 
+export const ByteList = new ListType({ limit: 2048, elementType: byteType })
 export interface PingMessage {
-    enr_seq: bigint
-    custom_payload: ByteVector
+    enrSeq: bigint
+    customPayload: ByteVector
 }
 
 export const PingPongMessageType = new ContainerType({
     fields: {
-        enr_seq: new BigIntUintType({ byteLength: 8 }),
-        custom_payload: new ListType({ limit: 2048, elementType: byteType })
+        enrSeq: new BigIntUintType({ byteLength: 8 }),
+        customPayload: ByteList
     }
 })
 
@@ -38,7 +40,7 @@ export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType
 
 export const StateNetworkCustomDataType = new ContainerType({
     fields: {
-        data_radius: new BigIntUintType({ byteLength: 32 })
+        dataRadius: new BigIntUintType({ byteLength: 32 })
     }
 })
 
@@ -53,3 +55,14 @@ export const FindNodesMessageType = new ContainerType({
     }
 })
 
+export interface NodesMessage {
+    total: Number,
+    enrs: Uint8Array[]
+}
+
+export const NodesMessageType = new ContainerType({
+    fields: {
+        total: byteType,
+        enrs: new ListType({ elementType: ByteList, limit: 32 })
+    }
+})

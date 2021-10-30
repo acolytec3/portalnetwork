@@ -3,9 +3,10 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, } from "../wire/types";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, } from "../wire/types";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
+import { shortId } from "../util";
 
 const log = debug("portalnetwork")
 
@@ -47,30 +48,41 @@ export class PortalNetwork extends EventEmitter {
      * @param dstId the nodeId of the peer to send a ping to
      */
     public sendPing = (dstId: string) => {
-        const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) })
+        const payload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) })
         const pingMsg = PingPongMessageType.serialize({
-            enr_seq: this.client.enr.seq,
-            custom_payload: payload
+            enrSeq: this.client.enr.seq,
+            customPayload: payload
         })
         this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), fromHexString(SubNetworkIds.StateNetworkId))
             .then((res) => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.PONG) {
-                    log(`Received PONG from ${dstId.slice(0, 15)}...`)
+                    log(`Received PONG from ${shortId(dstId)}`)
                     const decoded = PingPongMessageType.deserialize(res.slice(1))
                     log(decoded)
+                } else {
+                    log(`Received invalid response from ${shortId(dstId)} to PING request`)
                 }
             })
             .catch((err) => {
-                log(`Error during PING request to ${dstId.slice(0, 15)}...: ${err.toString()}`)
+                log(`Error during PING request to ${shortId(dstId)}: ${err.toString()}`)
             })
-        log(`Sending PING to ${dstId.slice(0, 15)}... for ${SubNetworkIds.StateNetworkId} subnetwork`)
+        log(`Sending PING to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
     public sendFindNodes = (dstId: string, distances: Uint16Array) => {
         const findNodesMsg: FindNodesMessage = { distances: distances }
         const payload = FindNodesMessageType.serialize(findNodesMsg)
         this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.FINDNODES]), Buffer.from(payload)]), fromHexString(SubNetworkIds.StateNetworkId))
-            .then(res => console.log(res))
+            .then(res => {
+                if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.NODES) {
+                    log(`Received NODES from ${shortId(dstId)}`);
+                    const decoded = NodesMessageType.deserialize(res.slice(1)) as NodesMessage
+                    log(`Received ${decoded.total} ENRs from ${shortId(dstId)}`);
+                    if (decoded.total > 0) {
+                        console.log(ENR.decode(Buffer.from(decoded.enrs[0])).nodeId)
+                    }
+                }
+            })
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
