@@ -75,7 +75,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:21](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L21)
+[src/portalnetwork/client.ts:17](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L17)
 
 ## Properties
 
@@ -85,7 +85,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:18](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L18)
+[src/portalnetwork/client.ts:14](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L14)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:19](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L19)
+[src/portalnetwork/client.ts:15](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L15)
 
 ___
 
@@ -210,7 +210,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:124](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L124)
+[src/portalnetwork/client.ts:125](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L125)
 
 ___
 
@@ -295,7 +295,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:41](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L41)
+[src/portalnetwork/client.ts:37](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L37)
 
 ___
 
@@ -374,7 +374,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:157](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L157)
+[src/portalnetwork/client.ts:158](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L158)
 
 ___
 
@@ -394,7 +394,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:149](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L149)
+[src/portalnetwork/client.ts:150](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L150)
 
 ___
 
@@ -414,7 +414,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:153](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L153)
+[src/portalnetwork/client.ts:154](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L154)
 
 ___
 
@@ -435,7 +435,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:138](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L138)
+[src/portalnetwork/client.ts:139](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L139)
 
 ___
 
@@ -603,7 +603,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:100](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L100)
+[src/portalnetwork/client.ts:101](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L101)
 
 ___
 
@@ -625,7 +625,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:120](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L120)
+[src/portalnetwork/client.ts:121](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L121)
 
 ___
 
@@ -953,12 +953,14 @@ ___
 
 ▸ **sendFindNodes**(`dstId`, `distances`): `void`
 
+Sends a Portal Network Wire Protocol FINDNODES request to a peer requesting other node ENRs
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `dstId` | `string` |
-| `distances` | `Uint16Array` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `dstId` | `string` | node id of peer |
+| `distances` | `Uint16Array` | distances as defined by subnetwork for node ENRs being requested |
 
 #### Returns
 
@@ -966,7 +968,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:72](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L72)
+[src/portalnetwork/client.ts:73](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L73)
 
 ___
 
@@ -988,7 +990,7 @@ Sends a Portal Network Wire Protocol PING message to a specified node
 
 #### Defined in
 
-[src/portalnetwork/client.ts:50](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L50)
+[src/portalnetwork/client.ts:46](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L46)
 
 ___
 
@@ -1009,7 +1011,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:89](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L89)
+[src/portalnetwork/client.ts:90](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L90)
 
 ___
 
@@ -1058,7 +1060,7 @@ Starts the portal network client
 
 #### Defined in
 
-[src/portalnetwork/client.ts:32](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L32)
+[src/portalnetwork/client.ts:28](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L28)
 
 ___
 

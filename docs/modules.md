@@ -35,4 +35,4 @@ https://github.com/ethereum/portal-network-specs/blob/master/state-network.md#di
 
 #### Defined in
 
-[src/dht/util.ts:11](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/dht/util.ts#L11)
+[src/dht/util.ts:11](https://github.com/acolytec3/portalnetwork/blob/b394578/src/dht/util.ts#L11)

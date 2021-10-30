@@ -544,7 +544,7 @@ KademliaRoutingTable.nearest
 
 #### Defined in
 
-[src/dht/dht.ts:13](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/dht/dht.ts#L13)
+[src/dht/dht.ts:13](https://github.com/acolytec3/portalnetwork/blob/b394578/src/dht/dht.ts#L13)
 
 ___
 
