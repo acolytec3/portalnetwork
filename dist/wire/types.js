@@ -1,15 +1,18 @@
-import { ContainerType, BigIntUintType, UnionType, ListType, byteType, NumberUintType } from "@chainsafe/ssz";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NodesMessageType = exports.FindNodesMessageType = exports.StateNetworkCustomDataType = exports.PortalWireMessageType = exports.PingPongMessageType = exports.ByteList = exports.MessageCodes = exports.SubNetworkIds = void 0;
+const ssz_1 = require("@chainsafe/ssz");
 // Subnetwork IDs
-export var SubNetworkIds;
+var SubNetworkIds;
 (function (SubNetworkIds) {
     SubNetworkIds["StateNetworkId"] = "0x500a";
     SubNetworkIds["HistoryNetworkId"] = "0x500b";
     SubNetworkIds["TxGossipNetworkId"] = "0x500c";
     SubNetworkIds["HeaderGossipNetworkId"] = "0x500d";
     SubNetworkIds["CanonIndicesNetworkId"] = "0x500e";
-})(SubNetworkIds || (SubNetworkIds = {}));
+})(SubNetworkIds = exports.SubNetworkIds || (exports.SubNetworkIds = {}));
 // Wire Protocol Message Codes
-export var MessageCodes;
+var MessageCodes;
 (function (MessageCodes) {
     MessageCodes[MessageCodes["PING"] = 1] = "PING";
     MessageCodes[MessageCodes["PONG"] = 2] = "PONG";
@@ -19,28 +22,28 @@ export var MessageCodes;
     MessageCodes[MessageCodes["CONTENT"] = 6] = "CONTENT";
     MessageCodes[MessageCodes["OFFER"] = 7] = "OFFER";
     MessageCodes[MessageCodes["ACCEPT"] = 8] = "ACCEPT";
-})(MessageCodes || (MessageCodes = {}));
-export const ByteList = new ListType({ limit: 2048, elementType: byteType });
-export const PingPongMessageType = new ContainerType({
+})(MessageCodes = exports.MessageCodes || (exports.MessageCodes = {}));
+exports.ByteList = new ssz_1.ListType({ limit: 2048, elementType: ssz_1.byteType });
+exports.PingPongMessageType = new ssz_1.ContainerType({
     fields: {
-        enrSeq: new BigIntUintType({ byteLength: 8 }),
-        customPayload: ByteList
+        enrSeq: new ssz_1.BigIntUintType({ byteLength: 8 }),
+        customPayload: exports.ByteList
     }
 });
-export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType] });
-export const StateNetworkCustomDataType = new ContainerType({
+exports.PortalWireMessageType = new ssz_1.UnionType({ types: [exports.PingPongMessageType] });
+exports.StateNetworkCustomDataType = new ssz_1.ContainerType({
     fields: {
-        dataRadius: new BigIntUintType({ byteLength: 32 })
+        dataRadius: new ssz_1.BigIntUintType({ byteLength: 32 })
     }
 });
-export const FindNodesMessageType = new ContainerType({
+exports.FindNodesMessageType = new ssz_1.ContainerType({
     fields: {
-        distances: new ListType({ elementType: new NumberUintType({ byteLength: 2 }), limit: 256 })
+        distances: new ssz_1.ListType({ elementType: new ssz_1.NumberUintType({ byteLength: 2 }), limit: 256 })
     }
 });
-export const NodesMessageType = new ContainerType({
+exports.NodesMessageType = new ssz_1.ContainerType({
     fields: {
-        total: byteType,
-        enrs: new ListType({ elementType: ByteList, limit: 32 })
+        total: ssz_1.byteType,
+        enrs: new ssz_1.ListType({ elementType: exports.ByteList, limit: 32 })
     }
 });

@@ -22,6 +22,11 @@ export declare class PortalNetwork extends EventEmitter {
      * @param dstId the nodeId of the peer to send a ping to
      */
     sendPing: (dstId: string) => void;
+    /**
+     * Sends a Portal Network Wire Protocol FINDNODES request to a peer requesting other node ENRs
+     * @param dstId node id of peer
+     * @param distances distances as defined by subnetwork for node ENRs being requested
+     */
     sendFindNodes: (dstId: string, distances: Uint16Array) => void;
     private sendPong;
     private onTalkReq;

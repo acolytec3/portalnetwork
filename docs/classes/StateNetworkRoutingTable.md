@@ -1,66 +1,66 @@
-[portalnetwork](../README.md) / [Exports](../modules.md) / OverlayRoutingTable
+[portalnetwork](../README.md) / [Exports](../modules.md) / StateNetworkRoutingTable
 
-# Class: OverlayRoutingTable
+# Class: StateNetworkRoutingTable
 
 ## Hierarchy
 
 - `KademliaRoutingTable`
 
-  ↳ **`OverlayRoutingTable`**
+  ↳ **`StateNetworkRoutingTable`**
 
 ## Table of contents
 
 ### Constructors
 
-- [constructor](OverlayRoutingTable.md#constructor)
+- [constructor](StateNetworkRoutingTable.md#constructor)
 
 ### Properties
 
-- [ \_emitType](OverlayRoutingTable.md# _emittype)
-- [ \_emitterType](OverlayRoutingTable.md# _emittertype)
-- [ \_eventsType](OverlayRoutingTable.md# _eventstype)
-- [buckets](OverlayRoutingTable.md#buckets)
-- [k](OverlayRoutingTable.md#k)
-- [localId](OverlayRoutingTable.md#localid)
-- [size](OverlayRoutingTable.md#size)
+- [ \_emitType](StateNetworkRoutingTable.md# _emittype)
+- [ \_emitterType](StateNetworkRoutingTable.md# _emittertype)
+- [ \_eventsType](StateNetworkRoutingTable.md# _eventstype)
+- [buckets](StateNetworkRoutingTable.md#buckets)
+- [k](StateNetworkRoutingTable.md#k)
+- [localId](StateNetworkRoutingTable.md#localid)
+- [size](StateNetworkRoutingTable.md#size)
 
 ### Methods
 
-- [add](OverlayRoutingTable.md#add)
-- [addListener](OverlayRoutingTable.md#addlistener)
-- [clear](OverlayRoutingTable.md#clear)
-- [emit](OverlayRoutingTable.md#emit)
-- [eventNames](OverlayRoutingTable.md#eventnames)
-- [getMaxListeners](OverlayRoutingTable.md#getmaxlisteners)
-- [getValue](OverlayRoutingTable.md#getvalue)
-- [getWithPending](OverlayRoutingTable.md#getwithpending)
-- [isEmpty](OverlayRoutingTable.md#isempty)
-- [listenerCount](OverlayRoutingTable.md#listenercount)
-- [listeners](OverlayRoutingTable.md#listeners)
-- [nearest](OverlayRoutingTable.md#nearest)
-- [off](OverlayRoutingTable.md#off)
-- [on](OverlayRoutingTable.md#on)
-- [once](OverlayRoutingTable.md#once)
-- [prependListener](OverlayRoutingTable.md#prependlistener)
-- [prependOnceListener](OverlayRoutingTable.md#prependoncelistener)
-- [random](OverlayRoutingTable.md#random)
-- [rawListeners](OverlayRoutingTable.md#rawlisteners)
-- [remove](OverlayRoutingTable.md#remove)
-- [removeAllListeners](OverlayRoutingTable.md#removealllisteners)
-- [removeById](OverlayRoutingTable.md#removebyid)
-- [removeListener](OverlayRoutingTable.md#removelistener)
-- [setMaxListeners](OverlayRoutingTable.md#setmaxlisteners)
-- [update](OverlayRoutingTable.md#update)
-- [updateStatus](OverlayRoutingTable.md#updatestatus)
-- [updateValue](OverlayRoutingTable.md#updatevalue)
-- [values](OverlayRoutingTable.md#values)
-- [valuesOfDistance](OverlayRoutingTable.md#valuesofdistance)
+- [add](StateNetworkRoutingTable.md#add)
+- [addListener](StateNetworkRoutingTable.md#addlistener)
+- [clear](StateNetworkRoutingTable.md#clear)
+- [emit](StateNetworkRoutingTable.md#emit)
+- [eventNames](StateNetworkRoutingTable.md#eventnames)
+- [getMaxListeners](StateNetworkRoutingTable.md#getmaxlisteners)
+- [getValue](StateNetworkRoutingTable.md#getvalue)
+- [getWithPending](StateNetworkRoutingTable.md#getwithpending)
+- [isEmpty](StateNetworkRoutingTable.md#isempty)
+- [listenerCount](StateNetworkRoutingTable.md#listenercount)
+- [listeners](StateNetworkRoutingTable.md#listeners)
+- [nearest](StateNetworkRoutingTable.md#nearest)
+- [off](StateNetworkRoutingTable.md#off)
+- [on](StateNetworkRoutingTable.md#on)
+- [once](StateNetworkRoutingTable.md#once)
+- [prependListener](StateNetworkRoutingTable.md#prependlistener)
+- [prependOnceListener](StateNetworkRoutingTable.md#prependoncelistener)
+- [random](StateNetworkRoutingTable.md#random)
+- [rawListeners](StateNetworkRoutingTable.md#rawlisteners)
+- [remove](StateNetworkRoutingTable.md#remove)
+- [removeAllListeners](StateNetworkRoutingTable.md#removealllisteners)
+- [removeById](StateNetworkRoutingTable.md#removebyid)
+- [removeListener](StateNetworkRoutingTable.md#removelistener)
+- [setMaxListeners](StateNetworkRoutingTable.md#setmaxlisteners)
+- [update](StateNetworkRoutingTable.md#update)
+- [updateStatus](StateNetworkRoutingTable.md#updatestatus)
+- [updateValue](StateNetworkRoutingTable.md#updatevalue)
+- [values](StateNetworkRoutingTable.md#values)
+- [valuesOfDistance](StateNetworkRoutingTable.md#valuesofdistance)
 
 ## Constructors
 
 ### constructor
 
-• **new OverlayRoutingTable**(`localId`, `k`)
+• **new StateNetworkRoutingTable**(`localId`, `k`)
 
 Create a new routing table.
 
@@ -544,7 +544,7 @@ KademliaRoutingTable.nearest
 
 #### Defined in
 
-[src/dht/dht.ts:13](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/dht/dht.ts#L13)
+[src/dht/dht.ts:13](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/dht/dht.ts#L13)
 
 ___
 

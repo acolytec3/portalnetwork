@@ -1,19 +1,15 @@
-import { Discv5, ENR, fromHex, IDiscv5CreateOptions } from "@chainsafe/discv5";
+import { Discv5, ENR, IDiscv5CreateOptions } from "@chainsafe/discv5";
 import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv5/lib/message";
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, } from "../wire/types";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, MessageProps, } from "../wire";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
 
 const log = debug("portalnetwork")
 
-type MessageProps = {
-    type: Number,
-    body: PingMessage | undefined
-}
 export class PortalNetwork extends EventEmitter {
     client: Discv5;
     stateNetworkRoutingTable: StateNetworkRoutingTable;
@@ -69,6 +65,11 @@ export class PortalNetwork extends EventEmitter {
         log(`Sending PING to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
+    /**
+     * Sends a Portal Network Wire Protocol FINDNODES request to a peer requesting other node ENRs
+     * @param dstId node id of peer
+     * @param distances distances as defined by subnetwork for node ENRs being requested
+     */
     public sendFindNodes = (dstId: string, distances: Uint16Array) => {
         const findNodesMsg: FindNodesMessage = { distances: distances }
         const payload = FindNodesMessageType.serialize(findNodesMsg)
@@ -83,6 +84,7 @@ export class PortalNetwork extends EventEmitter {
                     }
                 }
             })
+        log(`Sending FINDNODES to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {

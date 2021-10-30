@@ -1,1 +1,1 @@
-export { PortalNetwork } from './client'
+export * from './client'

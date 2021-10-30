@@ -16,6 +16,13 @@ export declare enum MessageCodes {
     OFFER = 7,
     ACCEPT = 8
 }
+/**
+ * Portal Network Wire Protocol Base Message Properties type
+ */
+export declare type MessageProps = {
+    type: Number;
+    body: PingMessage | undefined;
+};
 export declare const ByteList: ListType<import("@chainsafe/ssz").List<any>>;
 export interface PingMessage {
     enrSeq: bigint;

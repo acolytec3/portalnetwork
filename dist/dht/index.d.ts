@@ -1,3 +1,3 @@
-export { StateNetworkRoutingTable } from "./dht";
-export { distance } from "./util";
+export * from "./dht";
+export * from "./util";
 //# sourceMappingURL=index.d.ts.map

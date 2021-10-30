@@ -1,6 +1,9 @@
-import { KademliaRoutingTable } from '@chainsafe/discv5';
-import { distance } from './util';
-export class StateNetworkRoutingTable extends KademliaRoutingTable {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StateNetworkRoutingTable = void 0;
+const discv5_1 = require("@chainsafe/discv5");
+const util_1 = require("./util");
+class StateNetworkRoutingTable extends discv5_1.KademliaRoutingTable {
     /**
      *
      * @param id id of node to find nearest nodes to
@@ -13,7 +16,7 @@ export class StateNetworkRoutingTable extends KademliaRoutingTable {
             results.push(...bucket.values());
         });
         results.sort((a, b) => {
-            const diff = distance(id, a.nodeId).sub(distance(id, b.nodeId));
+            const diff = (0, util_1.distance)(id, a.nodeId).sub((0, util_1.distance)(id, b.nodeId));
             if (diff.isNeg())
                 return -1;
             if (diff.isZero())
@@ -23,3 +26,4 @@ export class StateNetworkRoutingTable extends KademliaRoutingTable {
         return results.slice(0, limit);
     }
 }
+exports.StateNetworkRoutingTable = StateNetworkRoutingTable;

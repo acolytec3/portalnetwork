@@ -1,19 +1,23 @@
-import { Discv5, ENR } from "@chainsafe/discv5";
-import { MessageType } from "@chainsafe/discv5/lib/message";
-import { EventEmitter } from 'events';
-import debug from 'debug';
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessageType, NodesMessageType, } from "../wire/types";
-import { fromHexString, toHexString } from "@chainsafe/ssz";
-import { StateNetworkRoutingTable } from "..";
-import { shortId } from "../util";
-const log = debug("portalnetwork");
-export class PortalNetwork extends EventEmitter {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PortalNetwork = void 0;
+const tslib_1 = require("tslib");
+const discv5_1 = require("@chainsafe/discv5");
+const message_1 = require("@chainsafe/discv5/lib/message");
+const events_1 = require("events");
+const debug_1 = (0, tslib_1.__importDefault)(require("debug"));
+const wire_1 = require("../wire");
+const ssz_1 = require("@chainsafe/ssz");
+const __1 = require("..");
+const util_1 = require("../util");
+const log = (0, debug_1.default)("portalnetwork");
+class PortalNetwork extends events_1.EventEmitter {
     client;
     stateNetworkRoutingTable;
     constructor(config) {
         super();
-        this.client = Discv5.create(config);
-        this.stateNetworkRoutingTable = new StateNetworkRoutingTable(this.client.enr.nodeId, 5);
+        this.client = discv5_1.Discv5.create(config);
+        this.stateNetworkRoutingTable = new __1.StateNetworkRoutingTable(this.client.enr.nodeId, 5);
         this.client.on("talkReqReceived", this.onTalkReq);
         this.client.on("talkRespReceived", this.onTalkResp);
     }
@@ -29,7 +33,7 @@ export class PortalNetwork extends EventEmitter {
      * defaults to "portalnetwork*, discv5*"
      */
     enableLog = (namespaces = "portalnetwork*,discv5*") => {
-        debug.enable(namespaces);
+        debug_1.default.enable(namespaces);
     };
     /**
      *
@@ -37,86 +41,92 @@ export class PortalNetwork extends EventEmitter {
      * @param dstId the nodeId of the peer to send a ping to
      */
     sendPing = (dstId) => {
-        const payload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
-        const pingMsg = PingPongMessageType.serialize({
+        const payload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
+        const pingMsg = wire_1.PingPongMessageType.serialize({
             enrSeq: this.client.enr.seq,
             customPayload: payload
         });
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), fromHexString(SubNetworkIds.StateNetworkId))
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([wire_1.MessageCodes.PING]), Buffer.from(pingMsg)]), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
             .then((res) => {
-            if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.PONG) {
-                log(`Received PONG from ${shortId(dstId)}`);
-                const decoded = PingPongMessageType.deserialize(res.slice(1));
+            if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.PONG) {
+                log(`Received PONG from ${(0, util_1.shortId)(dstId)}`);
+                const decoded = wire_1.PingPongMessageType.deserialize(res.slice(1));
                 log(decoded);
             }
             else {
-                log(`Received invalid response from ${shortId(dstId)} to PING request`);
+                log(`Received invalid response from ${(0, util_1.shortId)(dstId)} to PING request`);
             }
         })
             .catch((err) => {
-            log(`Error during PING request to ${shortId(dstId)}: ${err.toString()}`);
+            log(`Error during PING request to ${(0, util_1.shortId)(dstId)}: ${err.toString()}`);
         });
-        log(`Sending PING to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`);
+        log(`Sending PING to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
     };
+    /**
+     * Sends a Portal Network Wire Protocol FINDNODES request to a peer requesting other node ENRs
+     * @param dstId node id of peer
+     * @param distances distances as defined by subnetwork for node ENRs being requested
+     */
     sendFindNodes = (dstId, distances) => {
         const findNodesMsg = { distances: distances };
-        const payload = FindNodesMessageType.serialize(findNodesMsg);
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.FINDNODES]), Buffer.from(payload)]), fromHexString(SubNetworkIds.StateNetworkId))
+        const payload = wire_1.FindNodesMessageType.serialize(findNodesMsg);
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([wire_1.MessageCodes.FINDNODES]), Buffer.from(payload)]), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
             .then(res => {
-            if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.NODES) {
-                log(`Received NODES from ${shortId(dstId)}`);
-                const decoded = NodesMessageType.deserialize(res.slice(1));
-                log(`Received ${decoded.total} ENRs from ${shortId(dstId)}`);
+            if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.NODES) {
+                log(`Received NODES from ${(0, util_1.shortId)(dstId)}`);
+                const decoded = wire_1.NodesMessageType.deserialize(res.slice(1));
+                log(`Received ${decoded.total} ENRs from ${(0, util_1.shortId)(dstId)}`);
                 if (decoded.total > 0) {
-                    console.log(ENR.decode(Buffer.from(decoded.enrs[0])).nodeId);
+                    console.log(discv5_1.ENR.decode(Buffer.from(decoded.enrs[0])).nodeId);
                 }
             }
         });
+        log(`Sending FINDNODES to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
     };
     sendPong = async (srcId, reqId) => {
-        const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) });
-        const pongMsg = PingPongMessageType.serialize({
+        const payload = wire_1.StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) });
+        const pongMsg = wire_1.PingPongMessageType.serialize({
             enr_seq: this.client.enr.seq,
             custom_payload: payload
         });
-        log('PONG payload ', Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]));
-        this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]));
+        log('PONG payload ', Buffer.concat([Buffer.from([wire_1.MessageCodes.PONG]), Buffer.from(pongMsg)]));
+        this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([wire_1.MessageCodes.PONG]), Buffer.from(pongMsg)]));
         const peerENR = this.client.getKadValue(srcId);
     };
     onTalkReq = async (srcId, sourceId, message) => {
-        switch (toHexString(message.protocol)) {
-            case SubNetworkIds.StateNetworkId:
+        switch ((0, ssz_1.toHexString)(message.protocol)) {
+            case wire_1.SubNetworkIds.StateNetworkId:
                 log(`Received State Subnetwork request`);
                 break;
             default:
-                log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`);
+                log(`Received TALKREQ message on unsupported protocol ${(0, ssz_1.toHexString)(message.protocol)}`);
                 return;
         }
         const decoded = this.decodeMessage(message);
         log(`TALKREQUEST message received from ${srcId}`);
         switch (decoded.type) {
-            case MessageCodes.PING:
+            case wire_1.MessageCodes.PING:
                 this.handlePing(srcId, message);
                 break;
-            case MessageCodes.PONG:
+            case wire_1.MessageCodes.PONG:
                 log(`PONG message not expected in TALKREQ`);
                 break;
-            case MessageCodes.FINDNODES:
+            case wire_1.MessageCodes.FINDNODES:
                 this.handleFindNodes(decoded.body);
                 break;
-            case MessageCodes.NODES:
+            case wire_1.MessageCodes.NODES:
                 log(`NODES message not expected in TALKREQ`);
                 break;
-            case MessageCodes.FINDCONTENT:
+            case wire_1.MessageCodes.FINDCONTENT:
                 this.handleFindContent(decoded.body);
                 break;
-            case MessageCodes.CONTENT:
+            case wire_1.MessageCodes.CONTENT:
                 log(`CONTENT message not expected in TALKREQ`);
                 break;
-            case MessageCodes.OFFER:
+            case wire_1.MessageCodes.OFFER:
                 this.handleOffer(decoded.body);
                 break;
-            case MessageCodes.ACCEPT:
+            case wire_1.MessageCodes.ACCEPT:
                 log(`ACCEPT message not expected in TALKREQ`);
                 break;
             default: log(`Unrecognized message type received`);
@@ -126,10 +136,10 @@ export class PortalNetwork extends EventEmitter {
         log(`TALKRESPONSE message received from ${srcId}, ${message.toString()}`);
     };
     decodeMessage = (message) => {
-        if (message.type === MessageType.TALKREQ) {
+        if (message.type === message_1.MessageType.TALKREQ) {
             return {
                 type: parseInt(message.request.slice(0, 1).toString('hex')),
-                body: PingPongMessageType.deserialize(message.request.slice(1))
+                body: wire_1.PingPongMessageType.deserialize(message.request.slice(1))
             };
         }
         else {
@@ -159,3 +169,4 @@ export class PortalNetwork extends EventEmitter {
         throw new Error("Method not implemented.");
     };
 }
+exports.PortalNetwork = PortalNetwork;

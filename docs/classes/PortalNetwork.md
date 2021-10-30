@@ -17,6 +17,7 @@
 ### Properties
 
 - [client](PortalNetwork.md#client)
+- [stateNetworkRoutingTable](PortalNetwork.md#statenetworkroutingtable)
 - [captureRejectionSymbol](PortalNetwork.md#capturerejectionsymbol)
 - [captureRejections](PortalNetwork.md#capturerejections)
 - [defaultMaxListeners](PortalNetwork.md#defaultmaxlisteners)
@@ -33,6 +34,7 @@
 - [handleFindContent](PortalNetwork.md#handlefindcontent)
 - [handleFindNodes](PortalNetwork.md#handlefindnodes)
 - [handleOffer](PortalNetwork.md#handleoffer)
+- [handlePing](PortalNetwork.md#handleping)
 - [listenerCount](PortalNetwork.md#listenercount)
 - [listeners](PortalNetwork.md#listeners)
 - [off](PortalNetwork.md#off)
@@ -45,6 +47,7 @@
 - [rawListeners](PortalNetwork.md#rawlisteners)
 - [removeAllListeners](PortalNetwork.md#removealllisteners)
 - [removeListener](PortalNetwork.md#removelistener)
+- [sendFindNodes](PortalNetwork.md#sendfindnodes)
 - [sendPing](PortalNetwork.md#sendping)
 - [sendPong](PortalNetwork.md#sendpong)
 - [setMaxListeners](PortalNetwork.md#setmaxlisteners)
@@ -72,7 +75,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:13](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L13)
+[src/portalnetwork/client.ts:21](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L21)
 
 ## Properties
 
@@ -82,7 +85,17 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:11](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L11)
+[src/portalnetwork/client.ts:18](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L18)
+
+___
+
+### stateNetworkRoutingTable
+
+• **stateNetworkRoutingTable**: [`StateNetworkRoutingTable`](StateNetworkRoutingTable.md)
+
+#### Defined in
+
+[src/portalnetwork/client.ts:19](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L19)
 
 ___
 
@@ -183,7 +196,7 @@ ___
 
 ### decodeMessage
 
-▸ `Private` **decodeMessage**(`message`): `any`
+▸ `Private` **decodeMessage**(`message`): `MessageProps`
 
 #### Parameters
 
@@ -193,11 +206,11 @@ ___
 
 #### Returns
 
-`any`
+`MessageProps`
 
 #### Defined in
 
-[src/portalnetwork/client.ts:95](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L95)
+[src/portalnetwork/client.ts:124](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L124)
 
 ___
 
@@ -282,7 +295,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:32](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L32)
+[src/portalnetwork/client.ts:41](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L41)
 
 ___
 
@@ -361,7 +374,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:112](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L112)
+[src/portalnetwork/client.ts:157](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L157)
 
 ___
 
@@ -381,7 +394,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:104](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L104)
+[src/portalnetwork/client.ts:149](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L149)
 
 ___
 
@@ -401,7 +414,28 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:108](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L108)
+[src/portalnetwork/client.ts:153](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L153)
+
+___
+
+### handlePing
+
+▸ `Private` **handlePing**(`srcId`, `message`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `srcId` | `string` |
+| `message` | `ITalkReqMessage` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:138](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L138)
 
 ___
 
@@ -569,7 +603,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:71](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L71)
+[src/portalnetwork/client.ts:100](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L100)
 
 ___
 
@@ -591,7 +625,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:91](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L91)
+[src/portalnetwork/client.ts:120](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L120)
 
 ___
 
@@ -915,6 +949,27 @@ node_modules/@types/node/events.d.ts:439
 
 ___
 
+### sendFindNodes
+
+▸ **sendFindNodes**(`dstId`, `distances`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `dstId` | `string` |
+| `distances` | `Uint16Array` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:72](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L72)
+
+___
+
 ### sendPing
 
 ▸ **sendPing**(`dstId`): `void`
@@ -933,7 +988,7 @@ Sends a Portal Network Wire Protocol PING message to a specified node
 
 #### Defined in
 
-[src/portalnetwork/client.ts:41](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L41)
+[src/portalnetwork/client.ts:50](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L50)
 
 ___
 
@@ -954,7 +1009,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:61](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L61)
+[src/portalnetwork/client.ts:89](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L89)
 
 ___
 
@@ -1003,7 +1058,7 @@ Starts the portal network client
 
 #### Defined in
 
-[src/portalnetwork/client.ts:23](https://github.com/acolytec3/portalnetwork/blob/71b1e12/src/portalnetwork/client.ts#L23)
+[src/portalnetwork/client.ts:32](https://github.com/acolytec3/portalnetwork/blob/ef8339f/src/portalnetwork/client.ts#L32)
 
 ___
 

@@ -22,6 +22,14 @@ export enum MessageCodes {
     ACCEPT = 0x08
 }
 
+/**
+ * Portal Network Wire Protocol Base Message Properties type
+ */
+export type MessageProps = {
+    type: Number,
+    body: PingMessage | undefined
+}
+
 export const ByteList = new ListType({ limit: 2048, elementType: byteType })
 export interface PingMessage {
     enrSeq: bigint
