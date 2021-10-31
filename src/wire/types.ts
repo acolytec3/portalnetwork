@@ -1,5 +1,5 @@
 import { ENR } from "@chainsafe/discv5";
-import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType } from "@chainsafe/ssz";
+import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType, BitListType, ByteVectorType } from "@chainsafe/ssz";
 
 // Subnetwork IDs
 export enum SubNetworkIds {
@@ -31,6 +31,8 @@ export type MessageProps = {
 }
 
 export const ByteList = new ListType({ limit: 2048, elementType: byteType })
+export const Bytes2 = new ByteVectorType({ length: 2 })
+export const ENRs = new ListType({ elementType: ByteList, limit: 32 })
 export interface PingMessage {
     enrSeq: bigint
     customPayload: ByteVector
@@ -71,6 +73,45 @@ export interface NodesMessage {
 export const NodesMessageType = new ContainerType({
     fields: {
         total: byteType,
-        enrs: new ListType({ elementType: ByteList, limit: 32 })
+        enrs: ENRs
+    }
+})
+
+export interface FindContentMessage {
+    contentKey: Uint8Array
+}
+
+export const FindContentMessageType = new ContainerType({
+    fields: {
+        contentKey: ByteList
+    }
+})
+
+export interface ContentMessage {
+    content: Uint8Array | Uint8Array[]
+}
+
+export const ContentMessageType = new UnionType({
+    types: [Bytes2, ByteList, ENRs]
+})
+export interface OfferMessage {
+    contentKeys: Uint8Array[]
+}
+
+export const OfferMessageType = new ContainerType({
+    fields: {
+        contentKeys: new ListType({ elementType: ByteList, limit: 64 })
+    }
+})
+
+export interface AcceptMessage {
+    connectionId: Uint8Array,
+    contentKeys: Boolean[]
+}
+
+export const AcceptMessageType = new ContainerType({
+    fields: {
+        connectionId: Bytes2,
+        contentKeys: new BitListType({ limit: 64 })
     }
 })
