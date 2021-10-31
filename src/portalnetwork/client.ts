@@ -3,7 +3,7 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, MessageProps, } from "../wire";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, MessageProps, PortalWireMessageType, OfferMessageType, FindContentMessageType, } from "../wire";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
@@ -88,10 +88,10 @@ export class PortalNetwork extends EventEmitter {
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
-        const payload = StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) })
+        const payload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) })
         const pongMsg = PingPongMessageType.serialize({
-            enr_seq: this.client.enr.seq,
-            custom_payload: payload
+            enrSeq: this.client.enr.seq,
+            customPayload: payload
         })
         log('PONG payload ', Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
         this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
@@ -103,16 +103,16 @@ export class PortalNetwork extends EventEmitter {
             case SubNetworkIds.StateNetworkId: log(`Received State Subnetwork request`); break;
             default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
         }
-        const decoded = this.decodeMessage(message);
+        const messageType = message.request[0];
         log(`TALKREQUEST message received from ${srcId}`)
-        switch (decoded.type) {
+        switch (messageType) {
             case MessageCodes.PING: this.handlePing(srcId, message); break;
             case MessageCodes.PONG: log(`PONG message not expected in TALKREQ`); break;
-            case MessageCodes.FINDNODES: this.handleFindNodes(decoded.body); break;
+            case MessageCodes.FINDNODES: this.handleFindNodes(srcId, message); break;
             case MessageCodes.NODES: log(`NODES message not expected in TALKREQ`); break;
-            case MessageCodes.FINDCONTENT: this.handleFindContent(decoded.body); break;
+            case MessageCodes.FINDCONTENT: this.handleFindContent(srcId, message); break;
             case MessageCodes.CONTENT: log(`CONTENT message not expected in TALKREQ`); break;
-            case MessageCodes.OFFER: this.handleOffer(decoded.body); break;
+            case MessageCodes.OFFER: this.handleOffer(srcId, message); break;
             case MessageCodes.ACCEPT: log(`ACCEPT message not expected in TALKREQ`); break;
             default: log(`Unrecognized message type received`)
         }
@@ -120,20 +120,6 @@ export class PortalNetwork extends EventEmitter {
 
     private onTalkResp = (srcId: string, sourceId: ENR | null, message: ITalkRespMessage) => {
         log(`TALKRESPONSE message received from ${srcId}, ${message.toString()}`)
-    }
-
-    private decodeMessage = (message: ITalkReqMessage | ITalkRespMessage): MessageProps => {
-        if (message.type === MessageType.TALKREQ) {
-            return {
-                type: parseInt(message.request.slice(0, 1).toString('hex')),
-                body: PingPongMessageType.deserialize(message.request.slice(1)) as PingMessage
-            }
-        } else {
-            return {
-                type: 0,
-                body: undefined
-            }
-        }
     }
 
     private handlePing = (srcId: string, message: ITalkReqMessage) => {
@@ -147,15 +133,21 @@ export class PortalNetwork extends EventEmitter {
         this.sendPong(srcId, message.id);
     }
 
-    private handleFindNodes = (body: any) => {
-        throw new Error("Method not implemented.");
+    private handleFindNodes = (srcId: string, message: ITalkReqMessage) => {
+        const decoded = FindNodesMessageType.deserialize(message.request.slice(1))
+        console.log(decoded);
+        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol)
     }
 
-    private handleOffer = (body: any) => {
-        throw new Error("Method not implemented.");
+    private handleOffer = (srcId: string, message: ITalkReqMessage) => {
+        const decoded = OfferMessageType.deserialize(message.request.slice(1))
+        console.log(decoded);
+        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol)
     }
 
-    private handleFindContent = (body: any) => {
-        throw new Error("Method not implemented.");
+    private handleFindContent = (srcId: string, message: ITalkReqMessage) => {
+        const decoded = FindContentMessageType.deserialize(message.request.slice(1))
+        console.log(decoded);
+        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol)
     }
 }

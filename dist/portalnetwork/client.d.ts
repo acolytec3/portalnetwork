@@ -31,7 +31,6 @@ export declare class PortalNetwork extends EventEmitter {
     private sendPong;
     private onTalkReq;
     private onTalkResp;
-    private decodeMessage;
     private handlePing;
     private handleFindNodes;
     private handleOffer;

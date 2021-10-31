@@ -27,12 +27,13 @@ export enum MessageCodes {
     ACCEPT = 0x08
 }
 
+type MessageUnion = PingMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage | undefined
 /**
  * Portal Network Wire Protocol Base Message Properties type
  */
 export type MessageProps = {
     type: Number,
-    body: PingMessage | undefined
+    body: MessageUnion
 }
 
 // Type Aliases

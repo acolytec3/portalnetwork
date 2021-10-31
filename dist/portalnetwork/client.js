@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PortalNetwork = void 0;
 const tslib_1 = require("tslib");
 const discv5_1 = require("@chainsafe/discv5");
-const message_1 = require("@chainsafe/discv5/lib/message");
 const events_1 = require("events");
 const debug_1 = (0, tslib_1.__importDefault)(require("debug"));
 const wire_1 = require("../wire");
@@ -84,10 +83,10 @@ class PortalNetwork extends events_1.EventEmitter {
         log(`Sending FINDNODES to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
     };
     sendPong = async (srcId, reqId) => {
-        const payload = wire_1.StateNetworkCustomDataType.serialize({ data_radius: BigInt(1) });
+        const payload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
         const pongMsg = wire_1.PingPongMessageType.serialize({
-            enr_seq: this.client.enr.seq,
-            custom_payload: payload
+            enrSeq: this.client.enr.seq,
+            customPayload: payload
         });
         log('PONG payload ', Buffer.concat([Buffer.from([wire_1.MessageCodes.PONG]), Buffer.from(pongMsg)]));
         this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([wire_1.MessageCodes.PONG]), Buffer.from(pongMsg)]));
@@ -102,9 +101,9 @@ class PortalNetwork extends events_1.EventEmitter {
                 log(`Received TALKREQ message on unsupported protocol ${(0, ssz_1.toHexString)(message.protocol)}`);
                 return;
         }
-        const decoded = this.decodeMessage(message);
+        const messageType = message.request[0];
         log(`TALKREQUEST message received from ${srcId}`);
-        switch (decoded.type) {
+        switch (messageType) {
             case wire_1.MessageCodes.PING:
                 this.handlePing(srcId, message);
                 break;
@@ -112,19 +111,19 @@ class PortalNetwork extends events_1.EventEmitter {
                 log(`PONG message not expected in TALKREQ`);
                 break;
             case wire_1.MessageCodes.FINDNODES:
-                this.handleFindNodes(decoded.body);
+                this.handleFindNodes(srcId, message);
                 break;
             case wire_1.MessageCodes.NODES:
                 log(`NODES message not expected in TALKREQ`);
                 break;
             case wire_1.MessageCodes.FINDCONTENT:
-                this.handleFindContent(decoded.body);
+                this.handleFindContent(srcId, message);
                 break;
             case wire_1.MessageCodes.CONTENT:
                 log(`CONTENT message not expected in TALKREQ`);
                 break;
             case wire_1.MessageCodes.OFFER:
-                this.handleOffer(decoded.body);
+                this.handleOffer(srcId, message);
                 break;
             case wire_1.MessageCodes.ACCEPT:
                 log(`ACCEPT message not expected in TALKREQ`);
@@ -134,20 +133,6 @@ class PortalNetwork extends events_1.EventEmitter {
     };
     onTalkResp = (srcId, sourceId, message) => {
         log(`TALKRESPONSE message received from ${srcId}, ${message.toString()}`);
-    };
-    decodeMessage = (message) => {
-        if (message.type === message_1.MessageType.TALKREQ) {
-            return {
-                type: parseInt(message.request.slice(0, 1).toString('hex')),
-                body: wire_1.PingPongMessageType.deserialize(message.request.slice(1))
-            };
-        }
-        else {
-            return {
-                type: 0,
-                body: undefined
-            };
-        }
     };
     handlePing = (srcId, message) => {
         // Check to see if node is already in state network routing table and add if not
@@ -159,14 +144,20 @@ class PortalNetwork extends events_1.EventEmitter {
         }
         this.sendPong(srcId, message.id);
     };
-    handleFindNodes = (body) => {
-        throw new Error("Method not implemented.");
+    handleFindNodes = (srcId, message) => {
+        const decoded = wire_1.FindNodesMessageType.deserialize(message.request.slice(1));
+        console.log(decoded);
+        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
     };
-    handleOffer = (body) => {
-        throw new Error("Method not implemented.");
+    handleOffer = (srcId, message) => {
+        const decoded = wire_1.OfferMessageType.deserialize(message.request.slice(1));
+        console.log(decoded);
+        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
     };
-    handleFindContent = (body) => {
-        throw new Error("Method not implemented.");
+    handleFindContent = (srcId, message) => {
+        const decoded = wire_1.FindContentMessageType.deserialize(message.request.slice(1));
+        console.log(decoded);
+        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
     };
 }
 exports.PortalNetwork = PortalNetwork;
