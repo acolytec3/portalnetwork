@@ -1,4 +1,3 @@
-import { ENR } from "@chainsafe/discv5";
 import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType, BitListType, ByteVectorType } from "@chainsafe/ssz";
 
 // Subnetwork IDs
@@ -10,6 +9,12 @@ export enum SubNetworkIds {
     CanonIndicesNetworkId = '0x500e',
 }
 
+// State Network Custom Data type
+export const StateNetworkCustomDataType = new ContainerType({
+    fields: {
+        dataRadius: new BigIntUintType({ byteLength: 32 })
+    }
+})
 // Wire Protocol Message Codes
 export enum MessageCodes {
     PING = 0x01,
@@ -30,6 +35,7 @@ export type MessageProps = {
     body: PingMessage | undefined
 }
 
+// Type Aliases
 export const ByteList = new ListType({ limit: 2048, elementType: byteType })
 export const Bytes2 = new ByteVectorType({ length: 2 })
 export const ENRs = new ListType({ elementType: ByteList, limit: 32 })
@@ -42,15 +48,6 @@ export const PingPongMessageType = new ContainerType({
     fields: {
         enrSeq: new BigIntUintType({ byteLength: 8 }),
         customPayload: ByteList
-    }
-})
-
-
-export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType] })
-
-export const StateNetworkCustomDataType = new ContainerType({
-    fields: {
-        dataRadius: new BigIntUintType({ byteLength: 32 })
     }
 })
 
@@ -115,3 +112,5 @@ export const AcceptMessageType = new ContainerType({
         contentKeys: new BitListType({ limit: 64 })
     }
 })
+
+export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType, FindNodesMessageType, NodesMessageType, FindContentMessageType, ContentMessageType, OfferMessageType, AcceptMessageType] })
