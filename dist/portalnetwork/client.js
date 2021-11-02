@@ -76,7 +76,7 @@ class PortalNetwork extends events_1.EventEmitter {
                 const decoded = wire_1.NodesMessageType.deserialize(res.slice(1));
                 log(`Received ${decoded.total} ENRs from ${(0, util_1.shortId)(dstId)}`);
                 if (decoded.total > 0) {
-                    console.log(discv5_1.ENR.decode(Buffer.from(decoded.enrs[0])).nodeId);
+                    log(discv5_1.ENR.decode(Buffer.from(decoded.enrs[0])).nodeId);
                 }
             }
         });
@@ -160,17 +160,20 @@ class PortalNetwork extends events_1.EventEmitter {
     };
     handleFindNodes = (srcId, message) => {
         const decoded = wire_1.FindNodesMessageType.deserialize(message.request.slice(1));
-        console.log(decoded);
+        log(`Received FINDNODES request from ${(0, util_1.shortId)(srcId)}`);
+        log(decoded);
         this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
     };
     handleOffer = (srcId, message) => {
         const decoded = wire_1.OfferMessageType.deserialize(message.request.slice(1));
-        console.log(decoded);
+        log(`Received OFFER request from ${(0, util_1.shortId)(srcId)}`);
+        log(decoded);
         this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
     };
     handleFindContent = (srcId, message) => {
         const decoded = wire_1.FindContentMessageType.deserialize(message.request.slice(1));
-        console.log(decoded);
+        log(`Received FINDCONTENT request from ${(0, util_1.shortId)(srcId)}`);
+        log(decoded);
         this.client.sendTalkResp(srcId, message.id, Buffer.from([6, 0, 1, 2]));
     };
 }

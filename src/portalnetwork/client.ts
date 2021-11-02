@@ -80,7 +80,7 @@ export class PortalNetwork extends EventEmitter {
                     const decoded = NodesMessageType.deserialize(res.slice(1)) as NodesMessage
                     log(`Received ${decoded.total} ENRs from ${shortId(dstId)}`);
                     if (decoded.total > 0) {
-                        console.log(ENR.decode(Buffer.from(decoded.enrs[0])).nodeId)
+                        log(ENR.decode(Buffer.from(decoded.enrs[0])).nodeId)
                     }
                 }
             })
@@ -149,19 +149,22 @@ export class PortalNetwork extends EventEmitter {
 
     private handleFindNodes = (srcId: string, message: ITalkReqMessage) => {
         const decoded = FindNodesMessageType.deserialize(message.request.slice(1))
-        console.log(decoded);
+        log(`Received FINDNODES request from ${shortId(srcId)}`)
+        log(decoded)
         this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol)
     }
 
     private handleOffer = (srcId: string, message: ITalkReqMessage) => {
         const decoded = OfferMessageType.deserialize(message.request.slice(1))
-        console.log(decoded);
+        log(`Received OFFER request from ${shortId(srcId)}`)
+        log(decoded)
         this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol)
     }
 
     private handleFindContent = (srcId: string, message: ITalkReqMessage) => {
         const decoded = FindContentMessageType.deserialize(message.request.slice(1))
-        console.log(decoded);
+        log(`Received FINDCONTENT request from ${shortId(srcId)}`)
+        log(decoded)
         this.client.sendTalkResp(srcId, message.id, Buffer.from([6, 0, 1, 2]))
     }
 }
