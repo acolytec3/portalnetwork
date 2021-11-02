@@ -80,20 +80,11 @@ export interface ContentMessage {
     content: Uint8Array | Uint8Array[]
 }
 
-export type connectionId = {
-    selector: number
-    value: Uint8Array
-}
+export type connectionId = Uint8Array
 
-export type content = {
-    selector: number,
-    value: Uint8Array
-}
+export type content = Uint8Array
 
-export type enrs = {
-    selector: number,
-    value: Uint8Array[]
-}
+export type enrs = Uint8Array[]
 
 export const ContentMessageType = new UnionType<Union<connectionId | content | enrs>>({
     types: [Bytes2, ByteList, ENRs]

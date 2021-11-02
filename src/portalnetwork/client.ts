@@ -3,7 +3,7 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, } from "../wire";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, ENRs, enrs, } from "../wire";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
@@ -165,6 +165,9 @@ export class PortalNetwork extends EventEmitter {
         const decoded = FindContentMessageType.deserialize(message.request.slice(1))
         log(`Received FINDCONTENT request from ${shortId(srcId)}`)
         log(decoded)
-        this.client.sendTalkResp(srcId, message.id, Buffer.from([6, 0, 1, 2]))
+        // Sends the node's ENR as the CONTENT response (dummy data to verify the union serialization is working)
+        const msg: enrs = [this.client.enr.encode()]
+        const payload = ContentMessageType.serialize({ selector: 2, value: msg })
+        this.client.sendTalkResp(srcId, message.id, Buffer.concat([Buffer.from([MessageCodes.CONTENT]), Buffer.from(payload)]))
     }
 }

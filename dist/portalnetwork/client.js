@@ -174,7 +174,10 @@ class PortalNetwork extends events_1.EventEmitter {
         const decoded = wire_1.FindContentMessageType.deserialize(message.request.slice(1));
         log(`Received FINDCONTENT request from ${(0, util_1.shortId)(srcId)}`);
         log(decoded);
-        this.client.sendTalkResp(srcId, message.id, Buffer.from([6, 0, 1, 2]));
+        // Sends the node's ENR as the CONTENT response (dummy data to verify the union serialization is working)
+        const msg = [this.client.enr.encode()];
+        const payload = wire_1.ContentMessageType.serialize({ selector: 2, value: msg });
+        this.client.sendTalkResp(srcId, message.id, Buffer.concat([Buffer.from([wire_1.MessageCodes.CONTENT]), Buffer.from(payload)]));
     };
 }
 exports.PortalNetwork = PortalNetwork;

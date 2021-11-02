@@ -41,19 +41,10 @@ export declare const FindContentMessageType: ContainerType<import("@chainsafe/ss
 export interface ContentMessage {
     content: Uint8Array | Uint8Array[];
 }
-export declare type connectionId = {
-    selector: number;
-    value: Uint8Array;
-};
-export declare type content = {
-    selector: number;
-    value: Uint8Array;
-};
-export declare type enrs = {
-    selector: number;
-    value: Uint8Array[];
-};
-export declare const ContentMessageType: UnionType<Union<connectionId | content | enrs>>;
+export declare type connectionId = Uint8Array;
+export declare type content = Uint8Array;
+export declare type enrs = Uint8Array[];
+export declare const ContentMessageType: UnionType<Union<Uint8Array | enrs>>;
 export interface OfferMessage {
     contentKeys: Uint8Array[];
 }
