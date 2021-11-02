@@ -82,6 +82,20 @@ class PortalNetwork extends events_1.EventEmitter {
         });
         log(`Sending FINDNODES to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
     };
+    sendFindContent(dstId, key) {
+        const findContentMsg = { contentKey: key };
+        const payload = wire_1.FindContentMessageType.serialize(findContentMsg);
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([wire_1.MessageCodes.FINDCONTENT]), Buffer.from(payload)]), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
+            .then(res => {
+            if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.CONTENT) {
+                log(`Received FOUNDCONTENT from ${(0, util_1.shortId)(dstId)}`);
+                log(res);
+                const decoded = wire_1.ContentMessageType.deserialize(res.slice(1));
+                log(decoded);
+            }
+        });
+        log(`Sending FINDCONTENT to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
+    }
     sendPong = async (srcId, reqId) => {
         const payload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
         const pongMsg = wire_1.PingPongMessageType.serialize({
@@ -157,7 +171,7 @@ class PortalNetwork extends events_1.EventEmitter {
     handleFindContent = (srcId, message) => {
         const decoded = wire_1.FindContentMessageType.deserialize(message.request.slice(1));
         console.log(decoded);
-        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
+        this.client.sendTalkResp(srcId, message.id, Buffer.from([6, 0, 1, 2]));
     };
 }
 exports.PortalNetwork = PortalNetwork;

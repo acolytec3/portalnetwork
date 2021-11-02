@@ -3,7 +3,7 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, MessageProps, PortalWireMessageType, OfferMessageType, FindContentMessageType, } from "../wire";
+import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, } from "../wire";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
@@ -87,6 +87,20 @@ export class PortalNetwork extends EventEmitter {
         log(`Sending FINDNODES to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
+    public sendFindContent(dstId: string, key: Uint8Array) {
+        const findContentMsg: FindContentMessage = { contentKey: key };
+        const payload = FindContentMessageType.serialize(findContentMsg);
+        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.FINDCONTENT]), Buffer.from(payload)]), fromHexString(SubNetworkIds.StateNetworkId))
+            .then(res => {
+                if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.CONTENT) {
+                    log(`Received FOUNDCONTENT from ${shortId(dstId)}`);
+                    log(res)
+                    const decoded = ContentMessageType.deserialize(res.slice(1))
+                    log(decoded)
+                }
+            })
+        log(`Sending FINDCONTENT to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
+    }
     private sendPong = async (srcId: string, reqId: bigint) => {
         const payload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) })
         const pongMsg = PingPongMessageType.serialize({
@@ -148,6 +162,6 @@ export class PortalNetwork extends EventEmitter {
     private handleFindContent = (srcId: string, message: ITalkReqMessage) => {
         const decoded = FindContentMessageType.deserialize(message.request.slice(1))
         console.log(decoded);
-        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol)
+        this.client.sendTalkResp(srcId, message.id, Buffer.from([6, 0, 1, 2]))
     }
 }

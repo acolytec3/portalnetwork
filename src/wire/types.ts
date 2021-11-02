@@ -1,4 +1,4 @@
-import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType, BitListType, ByteVectorType } from "@chainsafe/ssz";
+import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType, BitListType, ByteVectorType, Union } from "@chainsafe/ssz";
 
 // Subnetwork IDs
 export enum SubNetworkIds {
@@ -25,15 +25,6 @@ export enum MessageCodes {
     CONTENT = 0x06,
     OFFER = 0x07,
     ACCEPT = 0x08
-}
-
-type MessageUnion = PingMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage | undefined
-/**
- * Portal Network Wire Protocol Base Message Properties type
- */
-export type MessageProps = {
-    type: Number,
-    body: MessageUnion
 }
 
 // Type Aliases
@@ -89,7 +80,22 @@ export interface ContentMessage {
     content: Uint8Array | Uint8Array[]
 }
 
-export const ContentMessageType = new UnionType({
+export type connectionId = {
+    selector: number
+    value: Uint8Array
+}
+
+export type content = {
+    selector: number,
+    value: Uint8Array
+}
+
+export type enrs = {
+    selector: number,
+    value: Uint8Array[]
+}
+
+export const ContentMessageType = new UnionType<Union<connectionId | content | enrs>>({
     types: [Bytes2, ByteList, ENRs]
 })
 export interface OfferMessage {
