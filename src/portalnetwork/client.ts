@@ -3,7 +3,7 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, enrs } from "../wire";
+import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, enrs, OfferMessage, AcceptMessage } from "../wire";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
@@ -92,19 +92,37 @@ export class PortalNetwork extends EventEmitter {
         log(`Sending FINDNODES to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
-    public sendFindContent(dstId: string, key: Uint8Array) {
+    public sendFindContent = (dstId: string, key: Uint8Array) => {
         const findContentMsg: FindContentMessage = { contentKey: key };
         const payload = PortalWireMessageType.serialize({ selector: MessageCodes.FINDCONTENT, value: findContentMsg });
         this.client.sendTalkReq(dstId, Buffer.from(payload), fromHexString(SubNetworkIds.StateNetworkId))
             .then(res => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.CONTENT) {
                     log(`Received FOUNDCONTENT from ${shortId(dstId)}`);
+                    // TODO: Switch this to use PortalWireMessageType.deserialize if type inference can be worked out
                     const decoded = ContentMessageType.deserialize(res.slice(1))
                     log(decoded)
                 }
             })
         log(`Sending FINDCONTENT to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
+
+    public sendOffer = (dstId: string, contentKeys: Uint8Array[]) => {
+        const offerMsg: OfferMessage = {
+            contentKeys
+        }
+        const payload = PortalWireMessageType.serialize({ selector: MessageCodes.OFFER, value: offerMsg })
+        this.client.sendTalkReq(dstId, Buffer.from(payload), fromHexString(SubNetworkIds.StateNetworkId))
+            .then(res => {
+                const decoded = PortalWireMessageType.deserialize(res);
+                if (decoded.selector === MessageCodes.ACCEPT) {
+                    log(`Received ACCEPT message from ${shortId(dstId)}`);
+                    log(decoded.value);
+                    // TODO: Add code to initiate uTP streams with serving of requested content
+                }
+            })
+    }
+
     private sendPong = async (srcId: string, reqId: bigint) => {
         const customPayload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) })
         const payload = {
@@ -183,7 +201,19 @@ export class PortalNetwork extends EventEmitter {
         const decoded = PortalWireMessageType.deserialize(message.request)
         log(`Received OFFER request from ${shortId(srcId)}`)
         log(decoded)
-        this.client.sendTalkResp(srcId, message.id, Buffer.from([]))
+        const msg = decoded.value as OfferMessage;
+        if (msg.contentKeys.length > 0) {
+            // Sends dummy response to validate connections
+            // TODO: Replace with actual uTP connection ID and desired contentKeys
+            const payload: AcceptMessage = {
+                connectionId: new Uint8Array(2).fill(Math.floor(Math.random())),
+                contentKeys: [true]
+            }
+            const encodedPayload = PortalWireMessageType.serialize({ selector: MessageCodes.ACCEPT, value: payload });
+            this.client.sendTalkResp(srcId, message.id, Buffer.from(encodedPayload))
+        } else {
+            this.client.sendTalkResp(srcId, message.id, Buffer.from([]))
+        }
     }
 
     private handleFindContent = (srcId: string, message: ITalkReqMessage) => {

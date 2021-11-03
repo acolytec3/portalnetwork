@@ -87,19 +87,35 @@ class PortalNetwork extends events_1.EventEmitter {
         });
         log(`Sending FINDNODES to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
     };
-    sendFindContent(dstId, key) {
+    sendFindContent = (dstId, key) => {
         const findContentMsg = { contentKey: key };
         const payload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.FINDCONTENT, value: findContentMsg });
         this.client.sendTalkReq(dstId, Buffer.from(payload), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
             .then(res => {
             if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.CONTENT) {
                 log(`Received FOUNDCONTENT from ${(0, util_1.shortId)(dstId)}`);
+                // TODO: Switch this to use PortalWireMessageType.deserialize if type inference can be worked out
                 const decoded = wire_1.ContentMessageType.deserialize(res.slice(1));
                 log(decoded);
             }
         });
         log(`Sending FINDCONTENT to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
-    }
+    };
+    sendOffer = (dstId, contentKeys) => {
+        const offerMsg = {
+            contentKeys
+        };
+        const payload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.OFFER, value: offerMsg });
+        this.client.sendTalkReq(dstId, Buffer.from(payload), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
+            .then(res => {
+            const decoded = wire_1.PortalWireMessageType.deserialize(res);
+            if (decoded.selector === wire_1.MessageCodes.ACCEPT) {
+                log(`Received ACCEPT message from ${(0, util_1.shortId)(dstId)}`);
+                log(decoded.value);
+                // TODO: Add code to initiate uTP streams with serving of requested content
+            }
+        });
+    };
     sendPong = async (srcId, reqId) => {
         const customPayload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
         const payload = {
@@ -193,7 +209,20 @@ class PortalNetwork extends events_1.EventEmitter {
         const decoded = wire_1.PortalWireMessageType.deserialize(message.request);
         log(`Received OFFER request from ${(0, util_1.shortId)(srcId)}`);
         log(decoded);
-        this.client.sendTalkResp(srcId, message.id, Buffer.from([]));
+        const msg = decoded.value;
+        if (msg.contentKeys.length > 0) {
+            // Sends dummy response to validate connections
+            // TODO: Replace with actual uTP connection ID and desired contentKeys
+            const payload = {
+                connectionId: new Uint8Array(2).fill(Math.floor(Math.random())),
+                contentKeys: [true]
+            };
+            const encodedPayload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.ACCEPT, value: payload });
+            this.client.sendTalkResp(srcId, message.id, Buffer.from(encodedPayload));
+        }
+        else {
+            this.client.sendTalkResp(srcId, message.id, Buffer.from([]));
+        }
     };
     handleFindContent = (srcId, message) => {
         const decoded = wire_1.PortalWireMessageType.deserialize(message.request);

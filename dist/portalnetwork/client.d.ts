@@ -28,7 +28,8 @@ export declare class PortalNetwork extends EventEmitter {
      * @param distances distances as defined by subnetwork for node ENRs being requested
      */
     sendFindNodes: (dstId: string, distances: Uint16Array) => void;
-    sendFindContent(dstId: string, key: Uint8Array): void;
+    sendFindContent: (dstId: string, key: Uint8Array) => void;
+    sendOffer: (dstId: string, contentKeys: Uint8Array[]) => void;
     private sendPong;
     private onTalkReq;
     private onTalkResp;
