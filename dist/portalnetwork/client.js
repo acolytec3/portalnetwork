@@ -75,10 +75,13 @@ class PortalNetwork extends events_1.EventEmitter {
             .then(res => {
             if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.NODES) {
                 log(`Received NODES from ${(0, util_1.shortId)(dstId)}`);
-                const decoded = wire_1.NodesMessageType.deserialize(res.slice(1));
-                log(`Received ${decoded.total} ENRs from ${(0, util_1.shortId)(dstId)}`);
-                if (decoded.total > 0) {
-                    log(discv5_1.ENR.decode(Buffer.from(decoded.enrs[0])).nodeId);
+                const decoded = wire_1.PortalWireMessageType.deserialize(res);
+                //@ts-ignore -- Union type inference is failing for some reason
+                log(`Received ${decoded.value.total} ENRs from ${(0, util_1.shortId)(dstId)}`);
+                //@ts-ignore
+                if (decoded.value.total > 0) {
+                    //@ts-ignore
+                    log(discv5_1.ENR.decode(Buffer.from(decoded.value.enrs[0])).nodeId);
                 }
             }
         });
