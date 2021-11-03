@@ -89,12 +89,11 @@ class PortalNetwork extends events_1.EventEmitter {
     };
     sendFindContent(dstId, key) {
         const findContentMsg = { contentKey: key };
-        const payload = wire_1.FindContentMessageType.serialize(findContentMsg);
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([wire_1.MessageCodes.FINDCONTENT]), Buffer.from(payload)]), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
+        const payload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.FINDCONTENT, value: findContentMsg });
+        this.client.sendTalkReq(dstId, Buffer.from(payload), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
             .then(res => {
             if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.CONTENT) {
                 log(`Received FOUNDCONTENT from ${(0, util_1.shortId)(dstId)}`);
-                log(res);
                 const decoded = wire_1.ContentMessageType.deserialize(res.slice(1));
                 log(decoded);
             }
@@ -102,13 +101,14 @@ class PortalNetwork extends events_1.EventEmitter {
         log(`Sending FINDCONTENT to ${(0, util_1.shortId)(dstId)} for ${wire_1.SubNetworkIds.StateNetworkId} subnetwork`);
     }
     sendPong = async (srcId, reqId) => {
-        const payload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
+        const customPayload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
+        const payload = {
+            enrSeq: this.client.enr.seq,
+            customPayload: customPayload
+        };
         const pongMsg = wire_1.PortalWireMessageType.serialize({
             selector: wire_1.MessageCodes.PONG,
-            value: {
-                enrSeq: this.client.enr.seq,
-                customPayload: payload
-            }
+            value: payload
         });
         this.client.sendTalkResp(srcId, reqId, Buffer.from(pongMsg));
         const peerENR = this.client.getKadValue(srcId);
@@ -166,23 +166,42 @@ class PortalNetwork extends events_1.EventEmitter {
         this.sendPong(srcId, message.id);
     };
     handleFindNodes = (srcId, message) => {
-        const decoded = wire_1.FindNodesMessageType.deserialize(message.request.slice(1));
+        const decoded = wire_1.PortalWireMessageType.deserialize(message.request);
         log(`Received FINDNODES request from ${(0, util_1.shortId)(srcId)}`);
         log(decoded);
-        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
+        const payload = decoded.value;
+        if (payload.distances.length > 0) {
+            let nodesPayload = {
+                total: 0,
+                enrs: []
+            };
+            // Send the client's ENR if a node at distance 0 is requested
+            if (typeof payload.distances.find((res) => res === 0) === 'number')
+                nodesPayload = {
+                    total: 1,
+                    enrs: [this.client.enr.encode()]
+                };
+            // TODO: Return known nodes in State Network DHT at specified distances
+            const encodedPayload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.NODES, value: nodesPayload });
+            this.client.sendTalkResp(srcId, message.id, encodedPayload);
+        }
+        else {
+            this.client.sendTalkResp(srcId, message.id, Buffer.from([]));
+        }
     };
     handleOffer = (srcId, message) => {
-        const decoded = wire_1.OfferMessageType.deserialize(message.request.slice(1));
+        const decoded = wire_1.PortalWireMessageType.deserialize(message.request);
         log(`Received OFFER request from ${(0, util_1.shortId)(srcId)}`);
         log(decoded);
-        this.client.sendTalkReq(srcId, Buffer.from([]), message.protocol);
+        this.client.sendTalkResp(srcId, message.id, Buffer.from([]));
     };
     handleFindContent = (srcId, message) => {
-        const decoded = wire_1.FindContentMessageType.deserialize(message.request.slice(1));
+        const decoded = wire_1.PortalWireMessageType.deserialize(message.request);
         log(`Received FINDCONTENT request from ${(0, util_1.shortId)(srcId)}`);
         log(decoded);
         // Sends the node's ENR as the CONTENT response (dummy data to verify the union serialization is working)
         const msg = [this.client.enr.encode()];
+        // TODO: Switch this line to use PortalWireMessageType.serialize
         const payload = wire_1.ContentMessageType.serialize({ selector: 2, value: msg });
         this.client.sendTalkResp(srcId, message.id, Buffer.concat([Buffer.from([wire_1.MessageCodes.CONTENT]), Buffer.from(payload)]));
     };
