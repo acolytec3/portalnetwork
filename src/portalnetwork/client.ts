@@ -3,7 +3,7 @@ import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
-import { PingPongMessageType, StateNetworkCustomDataType, MessageCodes, SubNetworkIds, PingMessage, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, ENRs, enrs, } from "../wire";
+import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, enrs } from "../wire";
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
@@ -45,15 +45,17 @@ export class PortalNetwork extends EventEmitter {
      */
     public sendPing = (dstId: string) => {
         const payload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) })
-        const pingMsg = PingPongMessageType.serialize({
+        const pingMsg = PortalWireMessageType.serialize({
+            selector: MessageCodes.PING, value: {
             enrSeq: this.client.enr.seq,
             customPayload: payload
+            }
         })
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.PING]), Buffer.from(pingMsg)]), fromHexString(SubNetworkIds.StateNetworkId))
+        this.client.sendTalkReq(dstId, Buffer.from(pingMsg), fromHexString(SubNetworkIds.StateNetworkId))
             .then((res) => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.PONG) {
                     log(`Received PONG from ${shortId(dstId)}`)
-                    const decoded = PingPongMessageType.deserialize(res.slice(1))
+                    const decoded = PortalWireMessageType.deserialize(res)
                     log(decoded)
                 } else {
                     log(`Received invalid response from ${shortId(dstId)} to PING request`)
@@ -72,8 +74,8 @@ export class PortalNetwork extends EventEmitter {
      */
     public sendFindNodes = (dstId: string, distances: Uint16Array) => {
         const findNodesMsg: FindNodesMessage = { distances: distances }
-        const payload = FindNodesMessageType.serialize(findNodesMsg)
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([MessageCodes.FINDNODES]), Buffer.from(payload)]), fromHexString(SubNetworkIds.StateNetworkId))
+        const payload = PortalWireMessageType.serialize({ selector: MessageCodes.FINDNODES, value: findNodesMsg })
+        this.client.sendTalkReq(dstId, Buffer.from(payload), fromHexString(SubNetworkIds.StateNetworkId))
             .then(res => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.NODES) {
                     log(`Received NODES from ${shortId(dstId)}`);
@@ -103,12 +105,14 @@ export class PortalNetwork extends EventEmitter {
     }
     private sendPong = async (srcId: string, reqId: bigint) => {
         const payload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) })
-        const pongMsg = PingPongMessageType.serialize({
+        const pongMsg = PortalWireMessageType.serialize({
+            selector: MessageCodes.PONG,
+            value: {
             enrSeq: this.client.enr.seq,
             customPayload: payload
+            }
         })
-        log('PONG payload ', Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
-        this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([MessageCodes.PONG]), Buffer.from(pongMsg)]))
+        this.client.sendTalkResp(srcId, reqId, Buffer.from(pongMsg))
         const peerENR = this.client.getKadValue(srcId);
     }
 

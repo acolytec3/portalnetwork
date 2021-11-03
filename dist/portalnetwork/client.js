@@ -41,15 +41,17 @@ class PortalNetwork extends events_1.EventEmitter {
      */
     sendPing = (dstId) => {
         const payload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
-        const pingMsg = wire_1.PingPongMessageType.serialize({
-            enrSeq: this.client.enr.seq,
-            customPayload: payload
+        const pingMsg = wire_1.PortalWireMessageType.serialize({
+            selector: wire_1.MessageCodes.PING, value: {
+                enrSeq: this.client.enr.seq,
+                customPayload: payload
+            }
         });
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([wire_1.MessageCodes.PING]), Buffer.from(pingMsg)]), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
+        this.client.sendTalkReq(dstId, Buffer.from(pingMsg), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
             .then((res) => {
             if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.PONG) {
                 log(`Received PONG from ${(0, util_1.shortId)(dstId)}`);
-                const decoded = wire_1.PingPongMessageType.deserialize(res.slice(1));
+                const decoded = wire_1.PortalWireMessageType.deserialize(res);
                 log(decoded);
             }
             else {
@@ -68,8 +70,8 @@ class PortalNetwork extends events_1.EventEmitter {
      */
     sendFindNodes = (dstId, distances) => {
         const findNodesMsg = { distances: distances };
-        const payload = wire_1.FindNodesMessageType.serialize(findNodesMsg);
-        this.client.sendTalkReq(dstId, Buffer.concat([Buffer.from([wire_1.MessageCodes.FINDNODES]), Buffer.from(payload)]), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
+        const payload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.FINDNODES, value: findNodesMsg });
+        this.client.sendTalkReq(dstId, Buffer.from(payload), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
             .then(res => {
             if (parseInt(res.slice(0, 1).toString('hex')) === wire_1.MessageCodes.NODES) {
                 log(`Received NODES from ${(0, util_1.shortId)(dstId)}`);
@@ -98,12 +100,14 @@ class PortalNetwork extends events_1.EventEmitter {
     }
     sendPong = async (srcId, reqId) => {
         const payload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
-        const pongMsg = wire_1.PingPongMessageType.serialize({
-            enrSeq: this.client.enr.seq,
-            customPayload: payload
+        const pongMsg = wire_1.PortalWireMessageType.serialize({
+            selector: wire_1.MessageCodes.PONG,
+            value: {
+                enrSeq: this.client.enr.seq,
+                customPayload: payload
+            }
         });
-        log('PONG payload ', Buffer.concat([Buffer.from([wire_1.MessageCodes.PONG]), Buffer.from(pongMsg)]));
-        this.client.sendTalkResp(srcId, reqId, Buffer.concat([Buffer.from([wire_1.MessageCodes.PONG]), Buffer.from(pongMsg)]));
+        this.client.sendTalkResp(srcId, reqId, Buffer.from(pongMsg));
         const peerENR = this.client.getKadValue(srcId);
     };
     onTalkReq = async (srcId, sourceId, message) => {

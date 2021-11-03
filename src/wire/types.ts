@@ -1,4 +1,5 @@
 import { ContainerType, ByteVector, BigIntUintType, UnionType, ListType, byteType, NumberUintType, BitListType, ByteVectorType, Union } from "@chainsafe/ssz";
+import { NoneType } from '@chainsafe/ssz/lib/types/basic/none'
 
 // Subnetwork IDs
 export enum SubNetworkIds {
@@ -31,19 +32,32 @@ export enum MessageCodes {
 export const ByteList = new ListType({ limit: 2048, elementType: byteType })
 export const Bytes2 = new ByteVectorType({ length: 2 })
 export const ENRs = new ListType({ elementType: ByteList, limit: 32 })
-export interface PingMessage {
+export type PingMessage = {
     enrSeq: bigint
     customPayload: ByteVector
 }
 
-export const PingPongMessageType = new ContainerType({
+export type PongMessage = {
+    enrSeq: bigint
+    customPayload: ByteVector
+}
+
+export const PingMessageType = new ContainerType({
     fields: {
         enrSeq: new BigIntUintType({ byteLength: 8 }),
         customPayload: ByteList
     }
 })
 
-export interface FindNodesMessage {
+
+export const PongMessageType = new ContainerType({
+    fields: {
+        enrSeq: new BigIntUintType({ byteLength: 8 }),
+        customPayload: ByteList
+    }
+})
+
+export type FindNodesMessage = {
     distances: Uint16Array
 }
 
@@ -54,7 +68,7 @@ export const FindNodesMessageType = new ContainerType({
     }
 })
 
-export interface NodesMessage {
+export type NodesMessage = {
     total: Number,
     enrs: Uint8Array[]
 }
@@ -66,7 +80,7 @@ export const NodesMessageType = new ContainerType({
     }
 })
 
-export interface FindContentMessage {
+export type FindContentMessage = {
     contentKey: Uint8Array
 }
 
@@ -76,7 +90,7 @@ export const FindContentMessageType = new ContainerType({
     }
 })
 
-export interface ContentMessage {
+export type ContentMessage = {
     content: Uint8Array | Uint8Array[]
 }
 
@@ -89,7 +103,7 @@ export type enrs = Uint8Array[]
 export const ContentMessageType = new UnionType<Union<connectionId | content | enrs>>({
     types: [Bytes2, ByteList, ENRs]
 })
-export interface OfferMessage {
+export type OfferMessage = {
     contentKeys: Uint8Array[]
 }
 
@@ -99,7 +113,7 @@ export const OfferMessageType = new ContainerType({
     }
 })
 
-export interface AcceptMessage {
+export type AcceptMessage = {
     connectionId: Uint8Array,
     contentKeys: Boolean[]
 }
@@ -111,4 +125,4 @@ export const AcceptMessageType = new ContainerType({
     }
 })
 
-export const PortalWireMessageType = new UnionType({ types: [PingPongMessageType, FindNodesMessageType, NodesMessageType, FindContentMessageType, ContentMessageType, OfferMessageType, AcceptMessageType] })
+export const PortalWireMessageType = new UnionType<Union<NoneType | PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage>>({ types: [new NoneType(), PingMessageType, PongMessageType, FindNodesMessageType, NodesMessageType, FindContentMessageType, ContentMessageType, OfferMessageType, AcceptMessageType] })

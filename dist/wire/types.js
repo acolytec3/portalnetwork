@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PortalWireMessageType = exports.AcceptMessageType = exports.OfferMessageType = exports.ContentMessageType = exports.FindContentMessageType = exports.NodesMessageType = exports.FindNodesMessageType = exports.PingPongMessageType = exports.ENRs = exports.Bytes2 = exports.ByteList = exports.MessageCodes = exports.StateNetworkCustomDataType = exports.SubNetworkIds = void 0;
+exports.PortalWireMessageType = exports.AcceptMessageType = exports.OfferMessageType = exports.ContentMessageType = exports.FindContentMessageType = exports.NodesMessageType = exports.FindNodesMessageType = exports.PongMessageType = exports.PingMessageType = exports.ENRs = exports.Bytes2 = exports.ByteList = exports.MessageCodes = exports.StateNetworkCustomDataType = exports.SubNetworkIds = void 0;
 const ssz_1 = require("@chainsafe/ssz");
+const none_1 = require("@chainsafe/ssz/lib/types/basic/none");
 // Subnetwork IDs
 var SubNetworkIds;
 (function (SubNetworkIds) {
@@ -33,7 +34,13 @@ var MessageCodes;
 exports.ByteList = new ssz_1.ListType({ limit: 2048, elementType: ssz_1.byteType });
 exports.Bytes2 = new ssz_1.ByteVectorType({ length: 2 });
 exports.ENRs = new ssz_1.ListType({ elementType: exports.ByteList, limit: 32 });
-exports.PingPongMessageType = new ssz_1.ContainerType({
+exports.PingMessageType = new ssz_1.ContainerType({
+    fields: {
+        enrSeq: new ssz_1.BigIntUintType({ byteLength: 8 }),
+        customPayload: exports.ByteList
+    }
+});
+exports.PongMessageType = new ssz_1.ContainerType({
     fields: {
         enrSeq: new ssz_1.BigIntUintType({ byteLength: 8 }),
         customPayload: exports.ByteList
@@ -69,4 +76,4 @@ exports.AcceptMessageType = new ssz_1.ContainerType({
         contentKeys: new ssz_1.BitListType({ limit: 64 })
     }
 });
-exports.PortalWireMessageType = new ssz_1.UnionType({ types: [exports.PingPongMessageType, exports.FindNodesMessageType, exports.NodesMessageType, exports.FindContentMessageType, exports.ContentMessageType, exports.OfferMessageType, exports.AcceptMessageType] });
+exports.PortalWireMessageType = new ssz_1.UnionType({ types: [new none_1.NoneType(), exports.PingMessageType, exports.PongMessageType, exports.FindNodesMessageType, exports.NodesMessageType, exports.FindContentMessageType, exports.ContentMessageType, exports.OfferMessageType, exports.AcceptMessageType] });

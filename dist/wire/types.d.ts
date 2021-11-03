@@ -1,4 +1,5 @@
 import { ContainerType, ByteVector, UnionType, ListType, ByteVectorType, Union } from "@chainsafe/ssz";
+import { NoneType } from '@chainsafe/ssz/lib/types/basic/none';
 export declare enum SubNetworkIds {
     StateNetworkId = "0x500a",
     HistoryNetworkId = "0x500b",
@@ -20,39 +21,44 @@ export declare enum MessageCodes {
 export declare const ByteList: ListType<import("@chainsafe/ssz").List<any>>;
 export declare const Bytes2: ByteVectorType;
 export declare const ENRs: ListType<import("@chainsafe/ssz").List<any>>;
-export interface PingMessage {
+export declare type PingMessage = {
     enrSeq: bigint;
     customPayload: ByteVector;
-}
-export declare const PingPongMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export interface FindNodesMessage {
+};
+export declare type PongMessage = {
+    enrSeq: bigint;
+    customPayload: ByteVector;
+};
+export declare const PingMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
+export declare const PongMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
+export declare type FindNodesMessage = {
     distances: Uint16Array;
-}
+};
 export declare const FindNodesMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export interface NodesMessage {
+export declare type NodesMessage = {
     total: Number;
     enrs: Uint8Array[];
-}
+};
 export declare const NodesMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export interface FindContentMessage {
+export declare type FindContentMessage = {
     contentKey: Uint8Array;
-}
+};
 export declare const FindContentMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export interface ContentMessage {
+export declare type ContentMessage = {
     content: Uint8Array | Uint8Array[];
-}
+};
 export declare type connectionId = Uint8Array;
 export declare type content = Uint8Array;
 export declare type enrs = Uint8Array[];
 export declare const ContentMessageType: UnionType<Union<Uint8Array | enrs>>;
-export interface OfferMessage {
+export declare type OfferMessage = {
     contentKeys: Uint8Array[];
-}
+};
 export declare const OfferMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export interface AcceptMessage {
+export declare type AcceptMessage = {
     connectionId: Uint8Array;
     contentKeys: Boolean[];
-}
+};
 export declare const AcceptMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export declare const PortalWireMessageType: UnionType<Union<unknown>>;
+export declare const PortalWireMessageType: UnionType<Union<PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage | NoneType>>;
 //# sourceMappingURL=types.d.ts.map
