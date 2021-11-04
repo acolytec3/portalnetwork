@@ -60,5 +60,7 @@ export declare type AcceptMessage = {
     contentKeys: Boolean[];
 };
 export declare const AcceptMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-export declare const PortalWireMessageType: UnionType<Union<PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage | NoneType>>;
+declare type MessageTypeUnion = NoneType | PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage;
+export declare const PortalWireMessageType: UnionType<Union<MessageTypeUnion>>;
+export {};
 //# sourceMappingURL=types.d.ts.map
