@@ -8,7 +8,7 @@
     "dev": "tsc --declaration --outDir dist --watch",
     "build": "tsc --declaration --outDir dist",
     "docs": "typedoc src/index.ts",
-    "test": "tape -r  ts-node/register 'src/tests/**/*.spec.ts'"
+    "test": "tape -r  ts-node/register 'tests/**/*.spec.ts'"
   },
   "types": "dist/index.d.ts",
   "author": "acolytec3",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.7",
     "@types/tape": "^4.13.2",
+    "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
     "typedoc": "^0.22.5",
     "typedoc-plugin-markdown": "^3.11.3",
