@@ -121,6 +121,11 @@ export class PortalNetwork extends EventEmitter {
             })
     }
 
+    public sendUTPStreamRequest = async (dstId: string, connectionId: Uint8Array) => {
+        // Initiate a uTP stream request with a SYN packet
+        const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), SubNetworkIds.UTPNetworkId)
+    }
+
     private sendPong = async (srcId: string, reqId: bigint) => {
         const customPayload = StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) })
         const payload = {
@@ -138,8 +143,10 @@ export class PortalNetwork extends EventEmitter {
     private onTalkReq = async (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
         switch (toHexString(message.protocol)) {
             case SubNetworkIds.StateNetworkId: log(`Received State Subnetwork request`); break;
+            case SubNetworkIds.UTPNetworkId: log(`Received uTP stream request`); this.handleUTPStreamRequest(srcId, message); return;
             default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
         }
+
         const messageType = message.request[0];
         log(`TALKREQUEST message received from ${srcId}`)
         switch (messageType) {
@@ -224,4 +231,25 @@ export class PortalNetwork extends EventEmitter {
         const payload = ContentMessageType.serialize({ selector: 2, value: msg })
         this.client.sendTalkResp(srcId, message.id, Buffer.concat([Buffer.from([MessageCodes.CONTENT]), Buffer.from(payload)]))
     }
+
+    private handleUTPStreamRequest = async (srcId: string, message: ITalkReqMessage) => {
+        // Node should send STATE packet back as payload instead of empty array to uTP stream requester
+        this.client.sendTalkResp(srcId, message.id, Buffer.from([]))
+
+        // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
+        /**
+         * const dataToSend = getDatafromDB();
+         * let dataLeft = dataToSend.length;
+         * while (dataLeft.length > 0) {
+         *   const dataPacket = constructUTPDataPacket(dataToSend, dataLeft, requestId) // Returns a payload containing a chunk of the requested data
+         *   dataLeft -= dataPacket.payload.length
+         *   await this client.sendTalkReq(srcId, dataPacket, SubnetworkIds.UTPNetwork)
+         * }
+         * 
+         * let finishMessage = createUTPFinishPacket();
+         * this.client.sendTalkReq(srcId, finishMessage, SubnetworkIds.UTPNetwork);
+         */
+    }
+
 }
+

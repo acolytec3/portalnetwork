@@ -8,6 +8,7 @@ export enum SubNetworkIds {
     TxGossipNetworkId = '0x500c',
     HeaderGossipNetworkId = '0x500d',
     CanonIndicesNetworkId = '0x500e',
+    UTPNetworkId = '0x757470'
 }
 
 // State Network Custom Data type
