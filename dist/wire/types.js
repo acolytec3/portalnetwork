@@ -11,6 +11,7 @@ var SubNetworkIds;
     SubNetworkIds["TxGossipNetworkId"] = "0x500c";
     SubNetworkIds["HeaderGossipNetworkId"] = "0x500d";
     SubNetworkIds["CanonIndicesNetworkId"] = "0x500e";
+    SubNetworkIds["UTPNetworkId"] = "0x757470";
 })(SubNetworkIds = exports.SubNetworkIds || (exports.SubNetworkIds = {}));
 // State Network Custom Data type
 exports.StateNetworkCustomDataType = new ssz_1.ContainerType({

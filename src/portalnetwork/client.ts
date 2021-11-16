@@ -123,7 +123,7 @@ export class PortalNetwork extends EventEmitter {
 
     public sendUTPStreamRequest = async (dstId: string, connectionId: Uint8Array) => {
         // Initiate a uTP stream request with a SYN packet
-        const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), SubNetworkIds.UTPNetworkId)
+        const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), fromHexString(SubNetworkIds.UTPNetworkId))
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
@@ -234,7 +234,7 @@ export class PortalNetwork extends EventEmitter {
 
     private handleUTPStreamRequest = async (srcId: string, message: ITalkReqMessage) => {
         // Node should send STATE packet back as payload instead of empty array to uTP stream requester
-        this.client.sendTalkResp(srcId, message.id, Buffer.from([]))
+        this.client.sendTalkResp(srcId, message.id, Buffer.from(message.request))
 
         // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
         /**

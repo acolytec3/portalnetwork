@@ -30,6 +30,7 @@ export declare class PortalNetwork extends EventEmitter {
     sendFindNodes: (dstId: string, distances: Uint16Array) => void;
     sendFindContent: (dstId: string, key: Uint8Array) => void;
     sendOffer: (dstId: string, contentKeys: Uint8Array[]) => void;
+    sendUTPStreamRequest: (dstId: string, connectionId: Uint8Array) => Promise<void>;
     private sendPong;
     private onTalkReq;
     private onTalkResp;
@@ -37,5 +38,6 @@ export declare class PortalNetwork extends EventEmitter {
     private handleFindNodes;
     private handleOffer;
     private handleFindContent;
+    private handleUTPStreamRequest;
 }
 //# sourceMappingURL=client.d.ts.map

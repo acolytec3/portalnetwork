@@ -5,7 +5,8 @@ export declare enum SubNetworkIds {
     HistoryNetworkId = "0x500b",
     TxGossipNetworkId = "0x500c",
     HeaderGossipNetworkId = "0x500d",
-    CanonIndicesNetworkId = "0x500e"
+    CanonIndicesNetworkId = "0x500e",
+    UTPNetworkId = "0x757470"
 }
 export declare const StateNetworkCustomDataType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 export declare enum MessageCodes {
