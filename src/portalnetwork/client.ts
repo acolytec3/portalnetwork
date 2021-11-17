@@ -7,12 +7,14 @@ import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessa
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
+import { UtpProtocol } from '../wire/Ultralight-UTP/src'
 
 const log = debug("portalnetwork")
 
 export class PortalNetwork extends EventEmitter {
     client: Discv5;
     stateNetworkRoutingTable: StateNetworkRoutingTable;
+    uTP: UtpProtocol;
 
     constructor(config: IDiscv5CreateOptions) {
         super();
@@ -20,6 +22,7 @@ export class PortalNetwork extends EventEmitter {
         this.stateNetworkRoutingTable = new StateNetworkRoutingTable(this.client.enr.nodeId, 5)
         this.client.on("talkReqReceived", this.onTalkReq)
         this.client.on("talkRespReceived", this.onTalkResp)
+        this.uTP = new UtpProtocol(this.client);
     }
 
     /**
@@ -119,11 +122,13 @@ export class PortalNetwork extends EventEmitter {
                     // TODO: Add code to initiate uTP streams with serving of requested content
                 }
             })
-    }
+        }
+        
+        public sendUTPStreamRequest = async (dstId: string, connectionId: Uint8Array) => {
+            // Initiate a uTP stream request with a SYN packet
+            this.uTP.initiateSyn(dstId);
 
-    public sendUTPStreamRequest = async (dstId: string, connectionId: Uint8Array) => {
-        // Initiate a uTP stream request with a SYN packet
-        const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), fromHexString(SubNetworkIds.UTPNetworkId))
+            const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), fromHexString(SubNetworkIds.UTPNetworkId))
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
@@ -233,8 +238,11 @@ export class PortalNetwork extends EventEmitter {
     }
 
     private handleUTPStreamRequest = async (srcId: string, message: ITalkReqMessage) => {
-        // Node should send STATE packet back as payload instead of empty array to uTP stream requester
-        this.client.sendTalkResp(srcId, message.id, Buffer.from(message.request))
+        
+
+        // Decodes packet from Buffer and responds with TALKREQ with ACK (STATE PACKET) as the message.
+        this.uTP.handleIncomingSyn(Buffer.from(message.request), srcId);
+
 
         // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
         /**
