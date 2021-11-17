@@ -114,21 +114,22 @@ export class PortalNetwork extends EventEmitter {
         }
         const payload = PortalWireMessageType.serialize({ selector: MessageCodes.OFFER, value: offerMsg })
         this.client.sendTalkReq(dstId, Buffer.from(payload), fromHexString(SubNetworkIds.StateNetworkId))
-            .then(res => {
+            .then(async (res) => {
                 const decoded = PortalWireMessageType.deserialize(res);
                 if (decoded.selector === MessageCodes.ACCEPT) {
                     log(`Received ACCEPT message from ${shortId(dstId)}`);
                     log(decoded.value);
                     // TODO: Add code to initiate uTP streams with serving of requested content
+                    await this.sendUtpStreamRequest(dstId)
                 }
             })
         }
         
-        public sendUTPStreamRequest = async (dstId: string, connectionId: Uint8Array) => {
+        public sendUtpStreamRequest = async (dstId: string) => {
             // Initiate a uTP stream request with a SYN packet
             await this.uTP.initiateSyn(dstId);
 
-            const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), fromHexString(SubNetworkIds.UTPNetworkId))
+            // const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), fromHexString(SubNetworkIds.UTPNetworkId))
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
