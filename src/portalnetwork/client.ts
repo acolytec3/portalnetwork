@@ -126,7 +126,7 @@ export class PortalNetwork extends EventEmitter {
         
         public sendUTPStreamRequest = async (dstId: string, connectionId: Uint8Array) => {
             // Initiate a uTP stream request with a SYN packet
-            this.uTP.initiateSyn(dstId);
+            await this.uTP.initiateSyn(dstId);
 
             const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), fromHexString(SubNetworkIds.UTPNetworkId))
     }
@@ -242,6 +242,7 @@ export class PortalNetwork extends EventEmitter {
 
         // Decodes packet from Buffer and responds with TALKREQ with ACK (STATE PACKET) as the message.
         this.uTP.handleIncomingSyn(Buffer.from(message.request), srcId);
+        await this.uTP.handleIncomingSyn(message.request, srcId);
 
 
         // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
