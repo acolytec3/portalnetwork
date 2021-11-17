@@ -19,14 +19,14 @@ export const StateNetworkCustomDataType = new ContainerType({
 })
 // Wire Protocol Message Codes
 export enum MessageCodes {
-    PING = 0x01,
-    PONG = 0x02,
-    FINDNODES = 0x03,
-    NODES = 0x04,
-    FINDCONTENT = 0x05,
-    CONTENT = 0x06,
-    OFFER = 0x07,
-    ACCEPT = 0x08
+    PING = 0x00,
+    PONG = 0x01,
+    FINDNODES = 0x02,
+    NODES = 0x03,
+    FINDCONTENT = 0x04,
+    CONTENT = 0x05,
+    OFFER = 0x06,
+    ACCEPT = 0x07
 }
 
 // Type Aliases
@@ -126,5 +126,5 @@ export const AcceptMessageType = new ContainerType({
     }
 })
 
-type MessageTypeUnion = | NoneType | PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage
-export const PortalWireMessageType = new UnionType<Union<MessageTypeUnion>>({ types: [new NoneType(), PingMessageType, PongMessageType, FindNodesMessageType, NodesMessageType, FindContentMessageType, ContentMessageType, OfferMessageType, AcceptMessageType] })
+type MessageTypeUnion = | PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage
+export const PortalWireMessageType = new UnionType<Union<MessageTypeUnion>>({ types: [PingMessageType, PongMessageType, FindNodesMessageType, NodesMessageType, FindContentMessageType, ContentMessageType, OfferMessageType, AcceptMessageType] })
