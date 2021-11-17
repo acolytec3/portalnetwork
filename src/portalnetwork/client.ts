@@ -129,7 +129,6 @@ export class PortalNetwork extends EventEmitter {
             // Initiate a uTP stream request with a SYN packet
             await this.uTP.initiateSyn(dstId);
 
-            // const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), fromHexString(SubNetworkIds.UTPNetworkId))
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
