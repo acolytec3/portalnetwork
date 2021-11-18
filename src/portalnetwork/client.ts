@@ -125,10 +125,9 @@ export class PortalNetwork extends EventEmitter {
             })
         }
         
-        public sendUtpStreamRequest = async (dstId: string) => {
+    public sendUtpStreamRequest = async (dstId: string) => {
             // Initiate a uTP stream request with a SYN packet
-            await this.uTP.initiateSyn(dstId);
-
+            await this.uTP.initiateSyn(dstId)
     }
 
     private sendPong = async (srcId: string, reqId: bigint) => {
@@ -207,23 +206,28 @@ export class PortalNetwork extends EventEmitter {
 
     }
 
-    private handleOffer = (srcId: string, message: ITalkReqMessage) => {
+    private handleOffer = async (srcId: string, message: ITalkReqMessage) => {
         const decoded = PortalWireMessageType.deserialize(message.request)
         log(`Received OFFER request from ${shortId(srcId)}`)
         log(decoded)
         const msg = decoded.value as OfferMessage;
         if (msg.contentKeys.length > 0) {
-            // Sends dummy response to validate connections
-            // TODO: Replace with actual uTP connection ID and desired contentKeys
-            const payload: AcceptMessage = {
-                connectionId: new Uint8Array(2).fill(Math.floor(Math.random())),
-                contentKeys: [true]
-            }
-            const encodedPayload = PortalWireMessageType.serialize({ selector: MessageCodes.ACCEPT, value: payload });
-            this.client.sendTalkResp(srcId, message.id, Buffer.from(encodedPayload))
+            await this.sendAccept(srcId, message)
         } else {
             this.client.sendTalkResp(srcId, message.id, Buffer.from([]))
         }
+    }
+    
+    private sendAccept = async (srcId: string, message: ITalkReqMessage) => {
+        const connectionId = await this.uTP.initiateSyn(srcId);
+        const payload: AcceptMessage = {
+            connectionId: new Uint8Array(2).fill(connectionId),
+            contentKeys: [true]
+        }
+        const encodedPayload = PortalWireMessageType.serialize({ selector: MessageCodes.ACCEPT, value: payload });
+        this.client.sendTalkResp(srcId, message.id, Buffer.from(encodedPayload))
+        
+
     }
 
     private handleFindContent = (srcId: string, message: ITalkReqMessage) => {
