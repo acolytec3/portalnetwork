@@ -69,8 +69,8 @@ export function getMonoTimeStamp(): Uint32 {
 
   export function packetToBuffer(packet: Packet): Buffer {
     let buffer = Buffer.alloc(20 + (packet.payload ? packet.payload.length : 0))
-    let p = packet.header.pType.toString();
-    let v = packet.header.version.toString();
+    let p = packet.header.pType.toString(16);
+    let v = packet.header.version.toString(16);
     let pv = p + v;
     let typeAndVer = parseInt(pv,16)
 
