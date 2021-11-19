@@ -7,7 +7,7 @@ import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessa
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
-import { UtpProtocol } from '../wire/Ultralight-UTP/src'
+import { UtpProtocol } from '../wire/utp'
 
 const log = debug("portalnetwork")
 
