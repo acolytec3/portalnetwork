@@ -7,7 +7,7 @@ import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessa
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
-import { bufferToPacket, UtpProtocol } from '../wire/utp'
+import { bufferToPacket, PacketType, UtpProtocol } from '../wire/utp'
 
 const log = debug("portalnetwork")
 
@@ -246,9 +246,12 @@ export class PortalNetwork extends EventEmitter {
 
         // Decodes packet from Buffer and responds with TALKREQ with ACK (STATE PACKET) as the message.
         const packet = bufferToPacket(message.request)
-        log('utp packet', packet)
-        if (packet.header.pType === 4) {
-            await this.uTP.handleIncomingSyn(message.request, srcId);
+        switch (packet.header.pType) {
+            case PacketType.ST_SYN: await this.uTP.handleIncomingSyn(message.request, srcId); break;
+            case PacketType.ST_STATE: log('got STATE packet'); break;
+            case PacketType.ST_DATA: log('got DATA packet'); break;
+            case PacketType.ST_RESET: log('got RESET packet'); break;
+            case PacketType.ST_FIN: log('got FIN packet'); break;
         }
 
 
