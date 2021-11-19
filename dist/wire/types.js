@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PortalWireMessageType = exports.AcceptMessageType = exports.OfferMessageType = exports.ContentMessageType = exports.FindContentMessageType = exports.NodesMessageType = exports.FindNodesMessageType = exports.PongMessageType = exports.PingMessageType = exports.ENRs = exports.Bytes2 = exports.ByteList = exports.MessageCodes = exports.StateNetworkCustomDataType = exports.SubNetworkIds = void 0;
 const ssz_1 = require("@chainsafe/ssz");
-const none_1 = require("@chainsafe/ssz/lib/types/basic/none");
 // Subnetwork IDs
 var SubNetworkIds;
 (function (SubNetworkIds) {
@@ -22,14 +21,14 @@ exports.StateNetworkCustomDataType = new ssz_1.ContainerType({
 // Wire Protocol Message Codes
 var MessageCodes;
 (function (MessageCodes) {
-    MessageCodes[MessageCodes["PING"] = 1] = "PING";
-    MessageCodes[MessageCodes["PONG"] = 2] = "PONG";
-    MessageCodes[MessageCodes["FINDNODES"] = 3] = "FINDNODES";
-    MessageCodes[MessageCodes["NODES"] = 4] = "NODES";
-    MessageCodes[MessageCodes["FINDCONTENT"] = 5] = "FINDCONTENT";
-    MessageCodes[MessageCodes["CONTENT"] = 6] = "CONTENT";
-    MessageCodes[MessageCodes["OFFER"] = 7] = "OFFER";
-    MessageCodes[MessageCodes["ACCEPT"] = 8] = "ACCEPT";
+    MessageCodes[MessageCodes["PING"] = 0] = "PING";
+    MessageCodes[MessageCodes["PONG"] = 1] = "PONG";
+    MessageCodes[MessageCodes["FINDNODES"] = 2] = "FINDNODES";
+    MessageCodes[MessageCodes["NODES"] = 3] = "NODES";
+    MessageCodes[MessageCodes["FINDCONTENT"] = 4] = "FINDCONTENT";
+    MessageCodes[MessageCodes["CONTENT"] = 5] = "CONTENT";
+    MessageCodes[MessageCodes["OFFER"] = 6] = "OFFER";
+    MessageCodes[MessageCodes["ACCEPT"] = 7] = "ACCEPT";
 })(MessageCodes = exports.MessageCodes || (exports.MessageCodes = {}));
 // Type Aliases
 exports.ByteList = new ssz_1.ListType({ limit: 2048, elementType: ssz_1.byteType });
@@ -77,4 +76,4 @@ exports.AcceptMessageType = new ssz_1.ContainerType({
         contentKeys: new ssz_1.BitListType({ limit: 64 })
     }
 });
-exports.PortalWireMessageType = new ssz_1.UnionType({ types: [new none_1.NoneType(), exports.PingMessageType, exports.PongMessageType, exports.FindNodesMessageType, exports.NodesMessageType, exports.FindContentMessageType, exports.ContentMessageType, exports.OfferMessageType, exports.AcceptMessageType] });
+exports.PortalWireMessageType = new ssz_1.UnionType({ types: [exports.PingMessageType, exports.PongMessageType, exports.FindNodesMessageType, exports.NodesMessageType, exports.FindContentMessageType, exports.ContentMessageType, exports.OfferMessageType, exports.AcceptMessageType] });

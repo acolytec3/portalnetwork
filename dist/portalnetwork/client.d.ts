@@ -2,9 +2,11 @@
 import { Discv5, IDiscv5CreateOptions } from "@chainsafe/discv5";
 import { EventEmitter } from 'events';
 import { StateNetworkRoutingTable } from "..";
+import { UtpProtocol } from '../wire/utp';
 export declare class PortalNetwork extends EventEmitter {
     client: Discv5;
     stateNetworkRoutingTable: StateNetworkRoutingTable;
+    uTP: UtpProtocol;
     constructor(config: IDiscv5CreateOptions);
     /**
      * Starts the portal network client
@@ -30,13 +32,14 @@ export declare class PortalNetwork extends EventEmitter {
     sendFindNodes: (dstId: string, distances: Uint16Array) => void;
     sendFindContent: (dstId: string, key: Uint8Array) => void;
     sendOffer: (dstId: string, contentKeys: Uint8Array[]) => void;
-    sendUTPStreamRequest: (dstId: string, connectionId: Uint8Array) => Promise<void>;
+    sendUtpStreamRequest: (dstId: string) => Promise<void>;
     private sendPong;
     private onTalkReq;
     private onTalkResp;
     private handlePing;
     private handleFindNodes;
     private handleOffer;
+    private sendAccept;
     private handleFindContent;
     private handleUTPStreamRequest;
 }
