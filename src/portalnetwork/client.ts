@@ -7,7 +7,7 @@ import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessa
 import { fromHexString, toHexString } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
-import { UtpProtocol } from '../wire/utp'
+import { bufferToPacket, UtpProtocol } from '../wire/utp'
 
 const log = debug("portalnetwork")
 
@@ -37,7 +37,7 @@ export class PortalNetwork extends EventEmitter {
      * @param namespaces comma separated list of logging namespaces
      * defaults to "portalnetwork*, discv5*"
      */
-    public enableLog = (namespaces: string = "portalnetwork*,discv5*") => {
+    public enableLog = (namespaces: string = "portalnetwork*,discv5:service*") => {
         debug.enable(namespaces)
     }
 
@@ -245,7 +245,12 @@ export class PortalNetwork extends EventEmitter {
         
 
         // Decodes packet from Buffer and responds with TALKREQ with ACK (STATE PACKET) as the message.
-        await this.uTP.handleIncomingSyn(message.request, srcId);
+        const packet = bufferToPacket(message.request)
+        log('utp packet', packet)
+        if (packet.header.pType === 4) {
+            await this.uTP.handleIncomingSyn(message.request, srcId);
+        }
+
 
 
         // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
