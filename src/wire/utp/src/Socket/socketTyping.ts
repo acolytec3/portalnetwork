@@ -1,9 +1,8 @@
-import { Uint16, Uint32 } from "@chainsafe/lodestar-types";
 import { Packet } from "../Packets/Packet";
-// import { UtpSocketKey } from "./UtpSocketKey";
-// import {SocketConfig} from './utp_socket'
 import dgram from 'dgram';
 import { Multiaddr } from "multiaddr";
+import { Uint16, Uint32 } from "..";
+
 
 export const reorderBufferMaxSize: number = 1024;
 //   # Maximal number of payload bytes per packet. Total packet size will be equal to

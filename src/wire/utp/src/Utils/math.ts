@@ -5,6 +5,9 @@ import { PacketHeader } from "../Packets/PacketHeader";
 import { Packet } from "../Packets/Packet";
 import { Duration, Miliseconds } from "../Socket/socketTyping";
 import { minimalHeaderSize } from "../Packets/PacketTyping";
+import * as Convert from './Convert';
+
+
 export function getMonoTimeStamp(): Uint32 {
     let time = hrtime.bigint();
     return Number(time / BigInt(1000)) as Uint32;
@@ -39,40 +42,26 @@ export function getMonoTimeStamp(): Uint32 {
     return a > b ? a : b;
   }
 
-  export function decodePacketFromBytes(bytes: Uint8Array): Packet {
-    if (bytes.length < minimalHeaderSize) {
-      console.error("invalid header size");
-    }
-    const kind = bytes[0] >> 4;
-    let header: PacketHeader = new PacketHeader({
-      pType: kind,
-      extension: bytes[1],
-      connectionId: Buffer.from(bytes.subarray(2, 3)).readUInt16BE(),
-      seqNr: Buffer.from(bytes.subarray(16, 17)).readUInt16BE(),
-      ackNr: Buffer.from(bytes.subarray(18, 19)).readUInt16BE(),
-      timestamp: Buffer.from(bytes.subarray(4, 7)).readUInt16BE(),
-      timestampDiff: Buffer.from(bytes.subarray(8, 11)).readUInt16BE(),
-      wndSize: Buffer.from(bytes.subarray(12, 15)).readUInt16BE(),
-    });
-    let payload = bytes.length == 20 ? new Uint8Array(0) : bytes.subarray(20);
-    let packet: Packet = new Packet({ header: header, payload: payload });
-    return packet;
-  }
 
   export function bufferToPacket(buffer: Buffer): Packet {
+    let ptandver = buffer[0].toString(16);
+    let ver = ptandver[1];
+    let version = parseInt(ver);
+
+
     let packet: Packet = new Packet({
       header: new PacketHeader({
-        pType: 0,
-        version: 1,
-        extension: 0,
-        connectionId: buffer[0] & ID_MASK,
-        timestamp: buffer.readUInt16BE(2),
-        timestampDiff: buffer.readUInt32BE(4),
+        pType: buffer[0] >> 4,
+        version: version,
+        extension: buffer.readUInt8(1),
+        connectionId: buffer.readUInt16BE(2),
+        timestamp: buffer.readUInt32BE(4),
+        timestampDiff: buffer.readUInt32BE(8),
         wndSize: buffer.readUInt32BE(12),
         seqNr: buffer.readUInt16BE(16),
         ackNr: buffer.readUInt16BE(18)
       }),
-      payload: buffer.slice(20)
+      payload: buffer.subarray(20)
       }
     )
     return packet
@@ -80,18 +69,25 @@ export function getMonoTimeStamp(): Uint32 {
 
   export function packetToBuffer(packet: Packet): Buffer {
     let buffer = Buffer.alloc(20 + (packet.payload ? packet.payload.length : 0))
-    buffer[0] = packet.header.connectionId | VERSION
-    buffer[1] = EXTENSION
+    let p = packet.header.pType.toString();
+    let v = packet.header.version.toString();
+    let pv = p + v;
+    let typeAndVer = parseInt(pv,16)
+
+
+
+    buffer.writeUInt8(typeAndVer)
+    buffer.writeUInt8(EXTENSION, 1)
     buffer.writeUInt16BE(packet.header.connectionId, 2);
     buffer.writeUInt32BE(packet.header.timestamp, 4);
     buffer.writeUInt32BE(packet.header.timestampDiff as number, 8);
     buffer.writeUInt32BE(packet.header.wndSize as number, 12);
     buffer.writeUInt16BE(packet.header.seqNr, 16);
     buffer.writeUInt16BE(packet.header.seqNr, 18);
+    
     if (packet.payload) {
-      return Buffer.from(packet.payload)
-    } else {
-      return Buffer.alloc(20)
+      Buffer.concat([buffer, Buffer.from(packet.payload)])
     }
+    return buffer
   
   }

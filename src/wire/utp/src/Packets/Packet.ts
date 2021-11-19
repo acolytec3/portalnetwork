@@ -6,6 +6,7 @@ import {
 } from "./PacketTyping";
 import { PacketHeader } from "./PacketHeader";
 import { Uint16, Uint32 } from ".";
+import { packetToBuffer } from "..";
 
 
 
@@ -23,21 +24,8 @@ export class Packet {
   }
 
   encodePacket(): Buffer {
-    let buffer = Buffer.alloc(this.size)
-    buffer[0] = 1
-    buffer[1] = 0
-    buffer.writeUInt16BE(this.header.connectionId, 2);
-    buffer.writeUInt32BE(this.header.timestamp, 4);
-    buffer.writeUInt32BE(this.header.timestampDiff, 8);
-    buffer.writeUInt32BE(this.header.wndSize, 12);
-    buffer.writeUInt16BE(this.header.seqNr, 16);
-    buffer.writeUInt16BE(this.header.seqNr, 18);
-    if (this.payload) {
-      return Buffer.from(this.payload)
-    } else {
-      return Buffer.alloc(20)
-    }
-  
+    let buffer = packetToBuffer(this)
+    return buffer
   }
 }
 

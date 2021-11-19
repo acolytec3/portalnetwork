@@ -9,12 +9,12 @@ import {
   randUint16,
 } from "..";
 import { ConnectionState } from ".";
-import { assert } from "console";
+
 import EventEmitter from "events";
 import { Discv5 } from "@chainsafe/discv5";
+import assert from "assert";
 
 const MAX_WINDOW = 1280;
-
 const PacketSent = new EventTarget();
 PacketSent.addEventListener("Packet Sent", (id) => {
   console.log("packet sent to" + id);
