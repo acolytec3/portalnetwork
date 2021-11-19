@@ -1,5 +1,4 @@
 import { ContainerType, ByteVector, UnionType, ListType, ByteVectorType, Union } from "@chainsafe/ssz";
-import { NoneType } from '@chainsafe/ssz/lib/types/basic/none';
 export declare enum SubNetworkIds {
     StateNetworkId = "0x500a",
     HistoryNetworkId = "0x500b",
@@ -10,14 +9,14 @@ export declare enum SubNetworkIds {
 }
 export declare const StateNetworkCustomDataType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
 export declare enum MessageCodes {
-    PING = 1,
-    PONG = 2,
-    FINDNODES = 3,
-    NODES = 4,
-    FINDCONTENT = 5,
-    CONTENT = 6,
-    OFFER = 7,
-    ACCEPT = 8
+    PING = 0,
+    PONG = 1,
+    FINDNODES = 2,
+    NODES = 3,
+    FINDCONTENT = 4,
+    CONTENT = 5,
+    OFFER = 6,
+    ACCEPT = 7
 }
 export declare const ByteList: ListType<import("@chainsafe/ssz").List<any>>;
 export declare const Bytes2: ByteVectorType;
@@ -61,7 +60,7 @@ export declare type AcceptMessage = {
     contentKeys: Boolean[];
 };
 export declare const AcceptMessageType: ContainerType<import("@chainsafe/ssz").ObjectLike>;
-declare type MessageTypeUnion = NoneType | PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage;
+declare type MessageTypeUnion = PingMessage | PongMessage | FindNodesMessage | NodesMessage | FindContentMessage | ContentMessage | OfferMessage | AcceptMessage;
 export declare const PortalWireMessageType: UnionType<Union<MessageTypeUnion>>;
 export {};
 //# sourceMappingURL=types.d.ts.map

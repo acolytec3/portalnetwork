@@ -9,16 +9,19 @@ const wire_1 = require("../wire");
 const ssz_1 = require("@chainsafe/ssz");
 const __1 = require("..");
 const util_1 = require("../util");
+const utp_1 = require("../wire/utp");
 const log = (0, debug_1.default)("portalnetwork");
 class PortalNetwork extends events_1.EventEmitter {
     client;
     stateNetworkRoutingTable;
+    uTP;
     constructor(config) {
         super();
         this.client = discv5_1.Discv5.create(config);
         this.stateNetworkRoutingTable = new __1.StateNetworkRoutingTable(this.client.enr.nodeId, 5);
         this.client.on("talkReqReceived", this.onTalkReq);
         this.client.on("talkRespReceived", this.onTalkResp);
+        this.uTP = new utp_1.UtpProtocol(this.client);
     }
     /**
      * Starts the portal network client
@@ -31,7 +34,7 @@ class PortalNetwork extends events_1.EventEmitter {
      * @param namespaces comma separated list of logging namespaces
      * defaults to "portalnetwork*, discv5*"
      */
-    enableLog = (namespaces = "portalnetwork*,discv5*") => {
+    enableLog = (namespaces = "portalnetwork*,discv5:service*") => {
         debug_1.default.enable(namespaces);
     };
     /**
@@ -105,18 +108,19 @@ class PortalNetwork extends events_1.EventEmitter {
         };
         const payload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.OFFER, value: offerMsg });
         this.client.sendTalkReq(dstId, Buffer.from(payload), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.StateNetworkId))
-            .then(res => {
+            .then(async (res) => {
             const decoded = wire_1.PortalWireMessageType.deserialize(res);
             if (decoded.selector === wire_1.MessageCodes.ACCEPT) {
                 log(`Received ACCEPT message from ${(0, util_1.shortId)(dstId)}`);
                 log(decoded.value);
                 // TODO: Add code to initiate uTP streams with serving of requested content
+                await this.sendUtpStreamRequest(dstId);
             }
         });
     };
-    sendUTPStreamRequest = async (dstId, connectionId) => {
+    sendUtpStreamRequest = async (dstId) => {
         // Initiate a uTP stream request with a SYN packet
-        const synResponse = await this.client.sendTalkReq(dstId, Buffer.from(connectionId), (0, ssz_1.fromHexString)(wire_1.SubNetworkIds.UTPNetworkId));
+        await this.uTP.initiateSyn(dstId);
     };
     sendPong = async (srcId, reqId) => {
         const customPayload = wire_1.StateNetworkCustomDataType.serialize({ dataRadius: BigInt(1) });
@@ -211,24 +215,26 @@ class PortalNetwork extends events_1.EventEmitter {
             this.client.sendTalkResp(srcId, message.id, Buffer.from([]));
         }
     };
-    handleOffer = (srcId, message) => {
+    handleOffer = async (srcId, message) => {
         const decoded = wire_1.PortalWireMessageType.deserialize(message.request);
         log(`Received OFFER request from ${(0, util_1.shortId)(srcId)}`);
         log(decoded);
         const msg = decoded.value;
         if (msg.contentKeys.length > 0) {
-            // Sends dummy response to validate connections
-            // TODO: Replace with actual uTP connection ID and desired contentKeys
-            const payload = {
-                connectionId: new Uint8Array(2).fill(Math.floor(Math.random())),
-                contentKeys: [true]
-            };
-            const encodedPayload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.ACCEPT, value: payload });
-            this.client.sendTalkResp(srcId, message.id, Buffer.from(encodedPayload));
+            await this.sendAccept(srcId, message);
         }
         else {
             this.client.sendTalkResp(srcId, message.id, Buffer.from([]));
         }
+    };
+    sendAccept = async (srcId, message) => {
+        const connectionId = await this.uTP.initiateSyn(srcId);
+        const payload = {
+            connectionId: new Uint8Array(2).fill(connectionId),
+            contentKeys: [true]
+        };
+        const encodedPayload = wire_1.PortalWireMessageType.serialize({ selector: wire_1.MessageCodes.ACCEPT, value: payload });
+        this.client.sendTalkResp(srcId, message.id, Buffer.from(encodedPayload));
     };
     handleFindContent = (srcId, message) => {
         const decoded = wire_1.PortalWireMessageType.deserialize(message.request);
@@ -241,8 +247,12 @@ class PortalNetwork extends events_1.EventEmitter {
         this.client.sendTalkResp(srcId, message.id, Buffer.concat([Buffer.from([wire_1.MessageCodes.CONTENT]), Buffer.from(payload)]));
     };
     handleUTPStreamRequest = async (srcId, message) => {
-        // Node should send STATE packet back as payload instead of empty array to uTP stream requester
-        this.client.sendTalkResp(srcId, message.id, Buffer.from(message.request));
+        // Decodes packet from Buffer and responds with TALKREQ with ACK (STATE PACKET) as the message.
+        const packet = (0, utp_1.bufferToPacket)(message.request);
+        log('utp packet', packet);
+        if (packet.header.pType === 4) {
+            await this.uTP.handleIncomingSyn(message.request, srcId);
+        }
         // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
         /**
          * const dataToSend = getDatafromDB();
