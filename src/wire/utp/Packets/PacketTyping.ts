@@ -5,11 +5,11 @@ export const minimalHeaderSize = 20;
 export const protocolVersion = 1;
 
 export enum PacketType {
-  ST_DATA = 0 << 4,
-  ST_FIN = 1 << 4,
-  ST_STATE = 2 << 4,
-  ST_RESET = 3 << 4,
-  ST_SYN = 4 << 4,
+  ST_DATA = 0,
+  ST_FIN = 1,
+  ST_STATE = 2,
+  ST_RESET = 3,
+  ST_SYN = 4,
 }
 
 export const MIN_PACKET_SIZE = 20;
