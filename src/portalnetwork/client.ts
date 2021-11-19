@@ -245,7 +245,6 @@ export class PortalNetwork extends EventEmitter {
         
 
         // Decodes packet from Buffer and responds with TALKREQ with ACK (STATE PACKET) as the message.
-        this.uTP.handleIncomingSyn(Buffer.from(message.request), srcId);
         await this.uTP.handleIncomingSyn(message.request, srcId);
 
 

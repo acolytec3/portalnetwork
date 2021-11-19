@@ -13,6 +13,8 @@ import { ConnectionState } from ".";
 import EventEmitter from "events";
 import { Discv5 } from "@chainsafe/discv5";
 import assert from "assert";
+import { fromHexString } from "@chainsafe/ssz";
+import { SubNetworkIds } from "../..";
 
 const MAX_WINDOW = 1280;
 const PacketSent = new EventTarget();
@@ -63,7 +65,7 @@ export class _UTPSocket extends EventEmitter {
         this.max_window
       }`
     );
-    await this.client.sendTalkReq(dstId, msg, "utp");
+    await this.client.sendTalkReqSync(dstId, msg, fromHexString(SubNetworkIds.UTPNetworkId));
     console.log(`${type} packet sent.`);
   }
 
