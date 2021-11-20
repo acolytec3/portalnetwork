@@ -1,6 +1,9 @@
 import { _UTPSocket } from "../Socket/_UTPSocket";
 import { bufferToPacket, ConnectionState, Packet, randUint16 } from "..";
 import { Discv5 } from "@chainsafe/discv5";
+import { debug } from "debug";
+
+const log = debug("<uTP>")
 
 export class UtpProtocol {
   sockets: Record<string, _UTPSocket>;
@@ -34,6 +37,7 @@ export class UtpProtocol {
   
   
   async initiateSyn(dstId: string): Promise<number> {
+    log(`Requesting uTP stream connection with ${dstId}`)
     const socket = new _UTPSocket(this.client)
     this.sockets[dstId] = socket;
     
@@ -42,6 +46,7 @@ export class UtpProtocol {
   }
   
   async handleSynAck(payload: Buffer, dstId: string, content: Buffer): Promise<void> {
+    log("Received ST_STATE packet...SYN acked...Connection established.")
     const ack = bufferToPacket(payload);
     await this.processContent(content)
     this.sockets[dstId].state = ConnectionState.Connected;
@@ -49,6 +54,22 @@ export class UtpProtocol {
     this.payloadChunks.length > 0
     ? await this.sendData(this.nextChunk(), dstId)
     : await this.sockets[dstId].sendFin(dstId);
+  }
+
+  async handleAck(payload: Buffer, dstId: string): Promise<void> {
+    log("Received ST_STATE packet from " + dstId)
+    const ack = bufferToPacket(payload);
+    this.sockets[dstId].state = ConnectionState.Connected;
+    this.sockets[dstId].ackNr = ack.header.seqNr;
+    this.payloadChunks.length > 0
+    ? await this.sendData(this.nextChunk(), dstId)
+    : await this.sockets[dstId].sendFin(dstId);
+  }
+  async handleFin(payload: Buffer, dstId: string): Promise<void> {
+    log("Received ST_FIN packet from " + dstId + "...uTP stream closing...")
+    const ack = bufferToPacket(payload);
+    this.sockets[dstId].state = ConnectionState.Destroy
+    this.sockets[dstId].ackNr = ack.header.seqNr;
   }
   
   async sendData(chunk: Buffer, dstId: string): Promise<void> {
@@ -62,6 +83,7 @@ export class UtpProtocol {
     }
     
     async handleIncomingSyn(packetAsBuffer: Buffer, dstId: string): Promise<void> {
+      log(`Received incoming ST_SYN packet...uTP connection requested by ${dstId}`)
       let socket = new _UTPSocket(this.client);
       this.sockets[dstId] = socket;
       const packet: Packet = bufferToPacket(packetAsBuffer)
@@ -77,6 +99,7 @@ export class UtpProtocol {
       this.sockets[dstId].ackNr,
       dstId
     );
+    log(`uTP stream opened with ${dstId}`)
   }
 
   async handleIncomingData(packet: Packet, dstId: string): Promise<void> {

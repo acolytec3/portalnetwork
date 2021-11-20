@@ -37,7 +37,7 @@ export class PortalNetwork extends EventEmitter {
      * @param namespaces comma separated list of logging namespaces
      * defaults to "portalnetwork*, discv5*"
      */
-    public enableLog = (namespaces: string = "portalnetwork*,discv5:service*") => {
+    public enableLog = (namespaces: string = "portalnetwork*,discv5:service*,<uTP>*") => {
         debug.enable(namespaces)
     }
 
@@ -147,7 +147,7 @@ export class PortalNetwork extends EventEmitter {
     private onTalkReq = async (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
         switch (toHexString(message.protocol)) {
             case SubNetworkIds.StateNetworkId: log(`Received State Subnetwork request`); break;
-            case SubNetworkIds.UTPNetworkId: log(`Received uTP stream request`); this.handleUTPStreamRequest(srcId, message); return;
+            case SubNetworkIds.UTPNetworkId: log(`Received uTP packet`); this.handleUTPStreamRequest(srcId, message); return;
             default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
         }
 
@@ -249,6 +249,10 @@ export class PortalNetwork extends EventEmitter {
         log('utp packet', packet)
         if (packet.header.pType === 4) {
             await this.uTP.handleIncomingSyn(message.request, srcId);
+        } else if (packet.header.pType === 2) {
+            await this.uTP.handleAck(message.request,srcId)
+        } else if (packet.header.pType === 1) {
+            await this.uTP.handleFin(message.request,srcId)
         }
 
 
