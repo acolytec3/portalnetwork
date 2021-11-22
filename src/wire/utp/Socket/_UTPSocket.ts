@@ -66,7 +66,7 @@ export class _UTPSocket extends EventEmitter {
       }`
     );
     await this.client.sendTalkReqSync(dstId, msg, fromHexString(SubNetworkIds.UTPNetworkId));
-    console.log(`${type} packet sent.`);
+    console.log(`${PacketType[type]} packet sent.`);
   }
 
   async sendAck(
@@ -140,7 +140,7 @@ export class _UTPSocket extends EventEmitter {
       payload,
       this.rtt_var
     );
-    console.log(`Sending DATA packet ${packet} to ${dstId}`);
+    console.log(`Sending DATA packet to ${dstId}`, packet);
     await this.sendPacket(packet, dstId, PacketType.ST_DATA);
     console.log(`DATA packet ${packet} sent to ${dstId}`);
   }

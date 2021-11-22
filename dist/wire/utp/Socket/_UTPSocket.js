@@ -46,7 +46,7 @@ class _UTPSocket extends events_1.default {
         let msg = packet.encodePacket();
         (0, assert_1.default)(this.validatePacketSize(packet), `Packet size ${packet.encodePacket().length} too large for max_window: ${this.max_window}`);
         await this.client.sendTalkReqSync(dstId, msg, (0, ssz_1.fromHexString)(__2.SubNetworkIds.UTPNetworkId));
-        console.log(`${type} packet sent.`);
+        console.log(`${__1.PacketType[type]} packet sent.`);
     }
     async sendAck(seqNr, sndConnectionId, ackNr, dstId) {
         const packet = (0, __1.createAckPacket)(seqNr, sndConnectionId, ackNr, this.rtt_var);
@@ -88,7 +88,7 @@ class _UTPSocket extends events_1.default {
     }
     async sendData(seqNr, ackNr, sndConnectionId, payload, dstId) {
         let packet = (0, __1.createDataPacket)(seqNr, sndConnectionId, ackNr, this.max_window, payload, this.rtt_var);
-        console.log(`Sending DATA packet ${packet} to ${dstId}`);
+        console.log(`Sending DATA packet to ${dstId}`, packet);
         await this.sendPacket(packet, dstId, __1.PacketType.ST_DATA);
         console.log(`DATA packet ${packet} sent to ${dstId}`);
     }

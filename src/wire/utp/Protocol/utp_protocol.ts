@@ -19,14 +19,18 @@ export class UtpProtocol {
 
   async processContent(payload: Buffer): Promise<void> {
     let packetSize = 1200;
-    for (let i=0; i<payload.length; i+= packetSize) {
-      this.payloadChunks.push(payload.subarray(i, i+packetSize))
+    if (payload.length < packetSize) {
+      this.payloadChunks.push(payload)
+      console.log(this.payloadChunks)
+    }
+    else {
+      for (let i = 0; i < payload.length; i += packetSize) {
+        this.payloadChunks.push(payload.subarray(i, i + packetSize))
+      }
     }
   }
 
-  
-  
-  
+
   nextChunk(): Buffer {
     return this.payloadChunks.pop() as Buffer
   }
@@ -41,8 +45,7 @@ export class UtpProtocol {
     return this.sockets[dstId].sndConnectionId
   }
   
-  async handleSynAck(payload: Buffer, dstId: string, content: Buffer): Promise<void> {
-    const ack = bufferToPacket(payload);
+  async handleSynAck(ack: Packet, dstId: string, content: Buffer): Promise<void> {
     await this.processContent(content)
     this.sockets[dstId].state = ConnectionState.Connected;
     this.sockets[dstId].ackNr = ack.header.seqNr;
@@ -61,10 +64,10 @@ export class UtpProtocol {
       );
     }
     
-    async handleIncomingSyn(packetAsBuffer: Buffer, dstId: string): Promise<void> {
-      let socket = new _UTPSocket(this.client);
-      this.sockets[dstId] = socket;
-      const packet: Packet = bufferToPacket(packetAsBuffer)
+  async handleIncomingSyn(packet: Packet, dstId: string): Promise<void> {
+    let socket = new _UTPSocket(this.client);
+    this.sockets[dstId] = socket;
+
     this.sockets[dstId].updateRTT(packet.header.timestampDiff);
     this.sockets[dstId].rcvConnectionId = packet.header.connectionId + 1;
     this.sockets[dstId].sndConnectionId = packet.header.connectionId;
