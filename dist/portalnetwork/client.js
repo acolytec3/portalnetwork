@@ -34,7 +34,7 @@ class PortalNetwork extends events_1.EventEmitter {
      * @param namespaces comma separated list of logging namespaces
      * defaults to "portalnetwork*, discv5*"
      */
-    enableLog = (namespaces = "portalnetwork*,discv5:service*") => {
+    enableLog = (namespaces = "portalnetwork*,discv5:service*,<uTP>*") => {
         debug_1.default.enable(namespaces);
     };
     /**
@@ -262,6 +262,7 @@ class PortalNetwork extends events_1.EventEmitter {
                 log('got RESET packet');
                 break;
             case utp_1.PacketType.ST_FIN:
+                await this.uTP.handleFin(packet, srcId);
                 log('got FIN packet');
                 break;
         }

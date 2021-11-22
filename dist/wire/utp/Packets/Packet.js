@@ -5,6 +5,8 @@ const tslib_1 = require("tslib");
 const PacketTyping_1 = require("./PacketTyping");
 const PacketHeader_1 = require("./PacketHeader");
 const __1 = require("..");
+const debug_1 = require("debug");
+const log = (0, debug_1.debug)("<uTP>");
 class Packet {
     header;
     payload;
@@ -29,6 +31,7 @@ function createSynPacket(rcvConnectionId, seqNr, ackNr) {
         seqNr: seqNr,
         ackNr: ackNr || 0,
     });
+    log("Creating ST_SYN Packet...");
     let packet = new Packet({ header: h, payload: new Uint8Array() });
     return packet;
 }
@@ -42,6 +45,7 @@ function createAckPacket(seqNr, sndConnectionId, ackNr, rtt_var) {
         wndSize: PacketTyping_1.DEFAULT_WINDOW_SIZE,
         timestampDiff: rtt_var
     });
+    log("Creating ST_STATE Packet...");
     const packet = new Packet({ header: h, payload: new Uint8Array(0) });
     return packet;
 }
@@ -58,6 +62,7 @@ function createDataPacket(seqNr, sndConnectionId, ackNr, bufferSize, payload, rt
         ackNr: ackNr,
     });
     const packet = new Packet({ header: h, payload: payload });
+    log("Creating ST_DATA Packet...");
     return packet;
 }
 exports.createDataPacket = createDataPacket;
@@ -73,6 +78,7 @@ function createResetPacket(seqNr, sndConnectionId, ackNr) {
         seqNr: seqNr,
         ackNr: ackNr,
     });
+    log("Creating ST_RESET Packet...");
     return new Packet({ header: h, payload: new Uint8Array() });
 }
 exports.createResetPacket = createResetPacket;
@@ -88,6 +94,7 @@ function createFinPacket(connectionId, ackNr) {
         seqNr: Number("eof_pkt"),
         ackNr: ackNr
     });
+    log("Creating ST_FIN Packet...");
     return new Packet({ header: h, payload: new Uint8Array() });
 }
 exports.createFinPacket = createFinPacket;

@@ -8,10 +8,12 @@ const events_1 = (0, tslib_1.__importDefault)(require("events"));
 const assert_1 = (0, tslib_1.__importDefault)(require("assert"));
 const ssz_1 = require("@chainsafe/ssz");
 const __2 = require("../..");
+const debug_1 = require("debug");
+const log = (0, debug_1.debug)("<uTP>");
 const MAX_WINDOW = 1280;
 const PacketSent = new EventTarget();
 PacketSent.addEventListener("Packet Sent", (id) => {
-    console.log("packet sent to" + id);
+    log("Packet sent to" + id);
 });
 class _UTPSocket extends events_1.default {
     seqNr;
@@ -46,11 +48,12 @@ class _UTPSocket extends events_1.default {
         let msg = packet.encodePacket();
         (0, assert_1.default)(this.validatePacketSize(packet), `Packet size ${packet.encodePacket().length} too large for max_window: ${this.max_window}`);
         await this.client.sendTalkReqSync(dstId, msg, (0, ssz_1.fromHexString)(__2.SubNetworkIds.UTPNetworkId));
-        console.log(`${__1.PacketType[type]} packet sent.`);
+        log(`${__1.PacketType[type]} packet sent to ${dstId}.`);
+        type === 1 && log("uTP stream closed.");
     }
     async sendAck(seqNr, sndConnectionId, ackNr, dstId) {
         const packet = (0, __1.createAckPacket)(seqNr, sndConnectionId, ackNr, this.rtt_var);
-        console.log(`Sending ack packet ${packet}`);
+        log(`Sending ST_STATE packet ${packet.encodePacket().toString('hex')}`);
         await this.sendPacket(packet, dstId, __1.PacketType.ST_STATE);
     }
     // async sendAcceptPacket(packet: Packet, dstId: string) {
@@ -69,28 +72,28 @@ class _UTPSocket extends events_1.default {
         (0, assert_1.default)(this.state === _1.ConnectionState.SynSent);
         let packet = (0, __1.createSynPacket)(this.rcvConnectionId, this.seqNr++, this.ackNr);
         this.seqNr++;
-        console.log(`Sending SYN packet ${packet} to ${dstId}`);
+        log(`Sending SYN packet ${packet.encodePacket().toString('hex')} to ${dstId}...`);
         await this.sendPacket(packet, dstId, __1.PacketType.ST_SYN);
-        console.log(`SYN packet ${packet} sent to ${dstId}`);
+        // log(`SYN packet sent to ${dstId}`);
     }
     async sendFin(dstId) {
         let packet = (0, __1.createFinPacket)(this.sndConnectionId, this.ackNr);
-        console.log(`Sending FIN packet ${packet} to ${dstId}`);
+        log(`Sending FIN packet ${packet} to ${dstId}`);
         await this.sendPacket(packet, dstId, __1.PacketType.ST_FIN);
         this.seqNr = Number("eof_pkt");
-        console.log(`FIN packet ${packet} sent to ${dstId}`);
+        // log(`FIN packet ${packet} sent to ${dstId}`);
     }
     async sendReset(dstId) {
         let packet = (0, __1.createResetPacket)(this.seqNr, this.sndConnectionId, this.ackNr);
-        console.log(`Sending RESET packet ${packet} to ${dstId}`);
+        log(`Sending RESET packet ${packet} to ${dstId}`);
         await this.sendPacket(packet, dstId, __1.PacketType.ST_RESET);
-        console.log(`RESET packet ${packet} sent to ${dstId}`);
+        // log(`RESET packet ${packet} sent to ${dstId}`);
     }
     async sendData(seqNr, ackNr, sndConnectionId, payload, dstId) {
         let packet = (0, __1.createDataPacket)(seqNr, sndConnectionId, ackNr, this.max_window, payload, this.rtt_var);
-        console.log(`Sending DATA packet to ${dstId}`, packet);
+        log(`Sending DATA packet to ${dstId}`, packet);
         await this.sendPacket(packet, dstId, __1.PacketType.ST_DATA);
-        console.log(`DATA packet ${packet} sent to ${dstId}`);
+        // log(`DATA packet ${packet} sent to ${dstId}`);
     }
     updateRTT(packetRTT) {
         this.rtt_var += Math.abs(this.rtt - packetRTT - this.rtt_var) / 4;
