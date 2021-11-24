@@ -1,4 +1,4 @@
-import { Discv5, ENR, IDiscv5CreateOptions, IDiscv5Events } from "@chainsafe/discv5";
+import { Discv5, ENR, IDiscv5CreateOptions } from "@chainsafe/discv5";
 import { ITalkReqMessage, ITalkRespMessage } from "@chainsafe/discv5/lib/message";
 import { EventEmitter } from 'events'
 
