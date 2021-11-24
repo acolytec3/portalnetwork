@@ -34,7 +34,7 @@ class PortalNetwork extends events_1.EventEmitter {
      * @param namespaces comma separated list of logging namespaces
      * defaults to "portalnetwork*, discv5*"
      */
-    enableLog = (namespaces = "portalnetwork*,discv5:service*") => {
+    enableLog = (namespaces = "portalnetwork*,discv5:service*,<uTP>*") => {
         debug_1.default.enable(namespaces);
     };
     /**
@@ -141,7 +141,7 @@ class PortalNetwork extends events_1.EventEmitter {
                 log(`Received State Subnetwork request`);
                 break;
             case wire_1.SubNetworkIds.UTPNetworkId:
-                log(`Received uTP stream request`);
+                log(`Received uTP protocol message`);
                 this.handleUTPStreamRequest(srcId, message);
                 return;
             default:
@@ -247,25 +247,25 @@ class PortalNetwork extends events_1.EventEmitter {
         this.client.sendTalkResp(srcId, message.id, Buffer.concat([Buffer.from([wire_1.MessageCodes.CONTENT]), Buffer.from(payload)]));
     };
     handleUTPStreamRequest = async (srcId, message) => {
-        // Decodes packet from Buffer and responds with TALKREQ with ACK (STATE PACKET) as the message.
         const packet = (0, utp_1.bufferToPacket)(message.request);
-        log('utp packet', packet);
-        if (packet.header.pType === 4) {
-            await this.uTP.handleIncomingSyn(message.request, srcId);
+        switch (packet.header.pType) {
+            case utp_1.PacketType.ST_SYN:
+                await this.uTP.handleIncomingSyn(packet, srcId);
+                break;
+            case utp_1.PacketType.ST_DATA:
+                await this.uTP.handleIncomingData(packet, srcId);
+                break;
+            case utp_1.PacketType.ST_STATE:
+                log('got STATE packet');
+                break;
+            case utp_1.PacketType.ST_RESET:
+                log('got RESET packet');
+                break;
+            case utp_1.PacketType.ST_FIN:
+                await this.uTP.handleFin(packet, srcId);
+                log('got FIN packet');
+                break;
         }
-        // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
-        /**
-         * const dataToSend = getDatafromDB();
-         * let dataLeft = dataToSend.length;
-         * while (dataLeft.length > 0) {
-         *   const dataPacket = constructUTPDataPacket(dataToSend, dataLeft, requestId) // Returns a payload containing a chunk of the requested data
-         *   dataLeft -= dataPacket.payload.length
-         *   await this client.sendTalkReq(srcId, dataPacket, SubnetworkIds.UTPNetwork)
-         * }
-         *
-         * let finishMessage = createUTPFinishPacket();
-         * this.client.sendTalkReq(srcId, finishMessage, SubnetworkIds.UTPNetwork);
-         */
     };
 }
 exports.PortalNetwork = PortalNetwork;
