@@ -64,8 +64,7 @@ export class _UTPSocket extends EventEmitter {
     let msg = packet.encodePacket();
     assert(
       this.validatePacketSize(packet),
-      `Packet size ${packet.encodePacket().length} too large for max_window: ${
-        this.max_window
+      `Packet size ${packet.encodePacket().length} too large for max_window: ${this.max_window
       }`
     );
     await this.client.sendTalkReqSync(dstId, msg, fromHexString(SubNetworkIds.UTPNetworkId));
@@ -144,7 +143,7 @@ export class _UTPSocket extends EventEmitter {
       payload,
       this.rtt_var
     );
-    log(`Sending DATA packet ${packet} to ${dstId}`);
+    log(`Sending DATA packet to ${dstId}`, packet);
     await this.sendPacket(packet, dstId, PacketType.ST_DATA);
     // log(`DATA packet ${packet} sent to ${dstId}`);
   }

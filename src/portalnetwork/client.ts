@@ -156,6 +156,7 @@ export class PortalNetwork extends EventEmitter {
             case SubNetworkIds.StateNetworkId: this.log(`Received State Subnetwork request`); break;
             case SubNetworkIds.UTPNetworkId: this.log(`Received uTP packet`); this.handleUTPStreamRequest(srcId, message); return;
             default: this.log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
+
         }
 
         const messageType = message.request[0];
@@ -249,33 +250,16 @@ export class PortalNetwork extends EventEmitter {
     }
 
     private handleUTPStreamRequest = async (srcId: string, message: ITalkReqMessage) => {
-        
 
-        // Decodes packet from Buffer and handle according to packet type
         const packet = bufferToPacket(message.request)
         switch (packet.header.pType) {
-            case PacketType.ST_SYN: await this.uTP.handleIncomingSyn(message.request, srcId); break;
-            case PacketType.ST_STATE: await this.uTP.handleAck(message.request,srcId); this.log('got STATE packet'); break;
-            case PacketType.ST_DATA: this.log('got DATA packet'); break;
-            case PacketType.ST_RESET: this.log('got RESET packet'); break;
-            case PacketType.ST_FIN: await this.uTP.handleFin(message.request,srcId); this.log('got FIN packet'); break;
+
+            case PacketType.ST_SYN: await this.uTP.handleIncomingSyn(packet, srcId); break;
+            case PacketType.ST_DATA: await this.uTP.handleIncomingData(packet, srcId); break;
+            case PacketType.ST_STATE: log('got STATE packet'); break;
+            case PacketType.ST_RESET: log('got RESET packet'); break;
+            case PacketType.ST_FIN: await this.uTP.handleFin(packet, srcId); log('got FIN packet'); break;
         }
-
-
-
-        // TODO: Implement logic to retrieve requested data and stream to requesting node - something like below
-        /**
-         * const dataToSend = getDatafromDB();
-         * let dataLeft = dataToSend.length;
-         * while (dataLeft.length > 0) {
-         *   const dataPacket = constructUTPDataPacket(dataToSend, dataLeft, requestId) // Returns a payload containing a chunk of the requested data
-         *   dataLeft -= dataPacket.payload.length
-         *   await this client.sendTalkReq(srcId, dataPacket, SubnetworkIds.UTPNetwork)
-         * }
-         * 
-         * let finishMessage = createUTPFinishPacket();
-         * this.client.sendTalkReq(srcId, finishMessage, SubnetworkIds.UTPNetwork);
-         */
     }
 
 }
