@@ -256,9 +256,9 @@ export class PortalNetwork extends EventEmitter {
 
             case PacketType.ST_SYN: await this.uTP.handleIncomingSyn(packet, srcId); break;
             case PacketType.ST_DATA: await this.uTP.handleIncomingData(packet, srcId); break;
-            case PacketType.ST_STATE: log('got STATE packet'); break;
-            case PacketType.ST_RESET: log('got RESET packet'); break;
-            case PacketType.ST_FIN: await this.uTP.handleFin(packet, srcId); log('got FIN packet'); break;
+            case PacketType.ST_STATE: this.log('got STATE packet'); break;
+            case PacketType.ST_RESET: this.log('got RESET packet'); break;
+            case PacketType.ST_FIN: await this.uTP.handleFin(packet, srcId); this.log('got FIN packet'); break;
         }
     }
 
