@@ -1,21 +1,22 @@
 import { Discv5, ENR, IDiscv5CreateOptions } from "@chainsafe/discv5";
-import { ITalkReqMessage, ITalkRespMessage, MessageType } from "@chainsafe/discv5/lib/message";
+import { ITalkReqMessage, ITalkRespMessage } from "@chainsafe/discv5/lib/message";
 import { EventEmitter } from 'events'
 
 import debug from 'debug'
 import { StateNetworkCustomDataType, MessageCodes, SubNetworkIds, FindNodesMessageType, FindNodesMessage, NodesMessageType, NodesMessage, PortalWireMessageType, OfferMessageType, FindContentMessageType, FindContentMessage, ContentMessageType, enrs, OfferMessage, AcceptMessage } from "../wire";
-import { fromHexString, toHexString } from "@chainsafe/ssz";
+import { fromHexString, toHexString, Union } from "@chainsafe/ssz";
 import { StateNetworkRoutingTable } from "..";
 import { shortId } from "../util";
 import { bufferToPacket, PacketType, UtpProtocol } from '../wire/utp'
 
-const log = debug("portalnetwork")
+const _log = debug("portalnetwork")
+
 
 export class PortalNetwork extends EventEmitter {
     client: Discv5;
     stateNetworkRoutingTable: StateNetworkRoutingTable;
     uTP: UtpProtocol;
-
+    
     constructor(config: IDiscv5CreateOptions) {
         super();
         this.client = Discv5.create(config)
@@ -24,7 +25,13 @@ export class PortalNetwork extends EventEmitter {
         this.client.on("talkRespReceived", this.onTalkResp)
         this.uTP = new UtpProtocol(this.client);
     }
-
+    
+    log = (msg: any ) => {
+        _log(msg)
+        typeof msg === 'string'
+        ? this.emit("log", msg)
+        : this.emit("log", `Payload: SSZ Union<${Object.entries(msg).map(([k,v]) => {return `${k}: ${v}`}).toString()}>`)
+    }
     /**
      * Starts the portal network client
      */
@@ -57,17 +64,17 @@ export class PortalNetwork extends EventEmitter {
         this.client.sendTalkReq(dstId, Buffer.from(pingMsg), fromHexString(SubNetworkIds.StateNetworkId))
             .then((res) => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.PONG) {
-                    log(`Received PONG from ${shortId(dstId)}`)
+                    this.log(`Received PONG from ${shortId(dstId)}`)
                     const decoded = PortalWireMessageType.deserialize(res)
-                    log(decoded)
+                    this.log(decoded)
                 } else {
-                    log(`Received invalid response from ${shortId(dstId)} to PING request`)
+                    this.log(`Received invalid response from ${shortId(dstId)} to PING request`)
                 }
             })
             .catch((err) => {
-                log(`Error during PING request to ${shortId(dstId)}: ${err.toString()}`)
+                this.log(`Error during PING request to ${shortId(dstId)}: ${err.toString()}`)
             })
-        log(`Sending PING to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
+        this.log(`Sending PING to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
     /**
@@ -81,16 +88,16 @@ export class PortalNetwork extends EventEmitter {
         this.client.sendTalkReq(dstId, Buffer.from(payload), fromHexString(SubNetworkIds.StateNetworkId))
             .then(res => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.NODES) {
-                    log(`Received NODES from ${shortId(dstId)}`);
+                    this.log(`Received NODES from ${shortId(dstId)}`);
                     const decoded = PortalWireMessageType.deserialize(res);
                     const msg = decoded.value as NodesMessage;
-                    log(`Received ${msg.total} ENRs from ${shortId(dstId)}`);
+                    this.log(`Received ${msg.total} ENRs from ${shortId(dstId)}`);
                     if (msg.total > 0) {
-                        log(ENR.decode(Buffer.from(msg.enrs[0])).nodeId)
+                        this.log(ENR.decode(Buffer.from(msg.enrs[0])).nodeId)
                     }
                 }
             })
-        log(`Sending FINDNODES to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
+        this.log(`Sending FINDNODES to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
     public sendFindContent = (dstId: string, key: Uint8Array) => {
@@ -99,13 +106,13 @@ export class PortalNetwork extends EventEmitter {
         this.client.sendTalkReq(dstId, Buffer.from(payload), fromHexString(SubNetworkIds.StateNetworkId))
             .then(res => {
                 if (parseInt(res.slice(0, 1).toString('hex')) === MessageCodes.CONTENT) {
-                    log(`Received FOUNDCONTENT from ${shortId(dstId)}`);
+                    this.log(`Received FOUNDCONTENT from ${shortId(dstId)}`);
                     // TODO: Switch this to use PortalWireMessageType.deserialize if type inference can be worked out
                     const decoded = ContentMessageType.deserialize(res.slice(1))
-                    log(decoded)
+                    this.log(decoded)
                 }
             })
-        log(`Sending FINDCONTENT to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
+        this.log(`Sending FINDCONTENT to ${shortId(dstId)} for ${SubNetworkIds.StateNetworkId} subnetwork`)
     }
 
     public sendOffer = (dstId: string, contentKeys: Uint8Array[]) => {
@@ -117,8 +124,8 @@ export class PortalNetwork extends EventEmitter {
             .then(async (res) => {
                 const decoded = PortalWireMessageType.deserialize(res);
                 if (decoded.selector === MessageCodes.ACCEPT) {
-                    log(`Received ACCEPT message from ${shortId(dstId)}`);
-                    log(decoded.value);
+                    this.log(`Received ACCEPT message from ${shortId(dstId)}`);
+                    this.log(decoded.value);
                     // TODO: Add code to initiate uTP streams with serving of requested content
                     await this.sendUtpStreamRequest(dstId)
                 }
@@ -146,28 +153,29 @@ export class PortalNetwork extends EventEmitter {
 
     private onTalkReq = async (srcId: string, sourceId: ENR | null, message: ITalkReqMessage) => {
         switch (toHexString(message.protocol)) {
-            case SubNetworkIds.StateNetworkId: log(`Received State Subnetwork request`); break;
-            case SubNetworkIds.UTPNetworkId: log(`Received uTP protocol message`); this.handleUTPStreamRequest(srcId, message); return;
-            default: log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
+            case SubNetworkIds.StateNetworkId: this.log(`Received State Subnetwork request`); break;
+            case SubNetworkIds.UTPNetworkId: this.log(`Received uTP packet`); this.handleUTPStreamRequest(srcId, message); return;
+            default: this.log(`Received TALKREQ message on unsupported protocol ${toHexString(message.protocol)}`); return;
+
         }
 
         const messageType = message.request[0];
-        log(`TALKREQUEST message received from ${srcId}`)
+        this.log(`TALKREQUEST message received from ${srcId}`)
         switch (messageType) {
             case MessageCodes.PING: this.handlePing(srcId, message); break;
-            case MessageCodes.PONG: log(`PONG message not expected in TALKREQ`); break;
+            case MessageCodes.PONG: this.log(`PONG message not expected in TALKREQ`); break;
             case MessageCodes.FINDNODES: this.handleFindNodes(srcId, message); break;
-            case MessageCodes.NODES: log(`NODES message not expected in TALKREQ`); break;
+            case MessageCodes.NODES: this.log(`NODES message not expected in TALKREQ`); break;
             case MessageCodes.FINDCONTENT: this.handleFindContent(srcId, message); break;
-            case MessageCodes.CONTENT: log(`CONTENT message not expected in TALKREQ`); break;
+            case MessageCodes.CONTENT: this.log(`CONTENT message not expected in TALKREQ`); break;
             case MessageCodes.OFFER: this.handleOffer(srcId, message); break;
-            case MessageCodes.ACCEPT: log(`ACCEPT message not expected in TALKREQ`); break;
-            default: log(`Unrecognized message type received`)
+            case MessageCodes.ACCEPT: this.log(`ACCEPT message not expected in TALKREQ`); break;
+            default: this.log(`Unrecognized message type received`)
         }
     }
 
     private onTalkResp = (srcId: string, sourceId: ENR | null, message: ITalkRespMessage) => {
-        log(`TALKRESPONSE message received from ${srcId}, ${message.toString()}`)
+        this.log(`TALKRESPONSE message received from ${srcId}, ${message.toString()}`)
     }
 
     private handlePing = (srcId: string, message: ITalkReqMessage) => {
@@ -183,8 +191,8 @@ export class PortalNetwork extends EventEmitter {
 
     private handleFindNodes = (srcId: string, message: ITalkReqMessage) => {
         const decoded = PortalWireMessageType.deserialize(message.request)
-        log(`Received FINDNODES request from ${shortId(srcId)}`)
-        log(decoded)
+        this.log(`Received FINDNODES request from ${shortId(srcId)}`)
+        this.log(decoded)
         const payload = decoded.value as FindNodesMessage;
         if (payload.distances.length > 0) {
             let nodesPayload: NodesMessage = {
@@ -208,8 +216,8 @@ export class PortalNetwork extends EventEmitter {
 
     private handleOffer = async (srcId: string, message: ITalkReqMessage) => {
         const decoded = PortalWireMessageType.deserialize(message.request)
-        log(`Received OFFER request from ${shortId(srcId)}`)
-        log(decoded)
+        this.log(`Received OFFER request from ${shortId(srcId)}`)
+        this.log(decoded)
         const msg = decoded.value as OfferMessage;
         if (msg.contentKeys.length > 0) {
             await this.sendAccept(srcId, message)
@@ -232,8 +240,8 @@ export class PortalNetwork extends EventEmitter {
 
     private handleFindContent = (srcId: string, message: ITalkReqMessage) => {
         const decoded = PortalWireMessageType.deserialize(message.request)
-        log(`Received FINDCONTENT request from ${shortId(srcId)}`)
-        log(decoded)
+        this.log(`Received FINDCONTENT request from ${shortId(srcId)}`)
+        this.log(decoded)
         // Sends the node's ENR as the CONTENT response (dummy data to verify the union serialization is working)
         const msg: enrs = [this.client.enr.encode()]
         // TODO: Switch this line to use PortalWireMessageType.serialize
@@ -245,6 +253,7 @@ export class PortalNetwork extends EventEmitter {
 
         const packet = bufferToPacket(message.request)
         switch (packet.header.pType) {
+
             case PacketType.ST_SYN: await this.uTP.handleIncomingSyn(packet, srcId); break;
             case PacketType.ST_DATA: await this.uTP.handleIncomingData(packet, srcId); break;
             case PacketType.ST_STATE: log('got STATE packet'); break;
