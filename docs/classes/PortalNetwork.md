@@ -18,6 +18,7 @@
 
 - [client](PortalNetwork.md#client)
 - [stateNetworkRoutingTable](PortalNetwork.md#statenetworkroutingtable)
+- [uTP](PortalNetwork.md#utp)
 - [captureRejectionSymbol](PortalNetwork.md#capturerejectionsymbol)
 - [captureRejections](PortalNetwork.md#capturerejections)
 - [defaultMaxListeners](PortalNetwork.md#defaultmaxlisteners)
@@ -26,7 +27,6 @@
 ### Methods
 
 - [addListener](PortalNetwork.md#addlistener)
-- [decodeMessage](PortalNetwork.md#decodemessage)
 - [emit](PortalNetwork.md#emit)
 - [enableLog](PortalNetwork.md#enablelog)
 - [eventNames](PortalNetwork.md#eventnames)
@@ -35,8 +35,10 @@
 - [handleFindNodes](PortalNetwork.md#handlefindnodes)
 - [handleOffer](PortalNetwork.md#handleoffer)
 - [handlePing](PortalNetwork.md#handleping)
+- [handleUTPStreamRequest](PortalNetwork.md#handleutpstreamrequest)
 - [listenerCount](PortalNetwork.md#listenercount)
 - [listeners](PortalNetwork.md#listeners)
+- [log](PortalNetwork.md#log)
 - [off](PortalNetwork.md#off)
 - [on](PortalNetwork.md#on)
 - [onTalkReq](PortalNetwork.md#ontalkreq)
@@ -47,9 +49,13 @@
 - [rawListeners](PortalNetwork.md#rawlisteners)
 - [removeAllListeners](PortalNetwork.md#removealllisteners)
 - [removeListener](PortalNetwork.md#removelistener)
+- [sendAccept](PortalNetwork.md#sendaccept)
+- [sendFindContent](PortalNetwork.md#sendfindcontent)
 - [sendFindNodes](PortalNetwork.md#sendfindnodes)
+- [sendOffer](PortalNetwork.md#sendoffer)
 - [sendPing](PortalNetwork.md#sendping)
 - [sendPong](PortalNetwork.md#sendpong)
+- [sendUtpStreamRequest](PortalNetwork.md#sendutpstreamrequest)
 - [setMaxListeners](PortalNetwork.md#setmaxlisteners)
 - [start](PortalNetwork.md#start)
 - [getEventListeners](PortalNetwork.md#geteventlisteners)
@@ -75,7 +81,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:17](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L17)
+[src/portalnetwork/client.ts:20](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L20)
 
 ## Properties
 
@@ -85,7 +91,7 @@ EventEmitter.constructor
 
 #### Defined in
 
-[src/portalnetwork/client.ts:14](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L14)
+[src/portalnetwork/client.ts:16](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L16)
 
 ___
 
@@ -95,7 +101,17 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:15](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L15)
+[src/portalnetwork/client.ts:17](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L17)
+
+___
+
+### uTP
+
+• **uTP**: `UtpProtocol`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:18](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L18)
 
 ___
 
@@ -194,26 +210,6 @@ node_modules/@types/node/events.d.ts:299
 
 ___
 
-### decodeMessage
-
-▸ `Private` **decodeMessage**(`message`): `MessageProps`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `message` | `ITalkReqMessage` \| `ITalkRespMessage` |
-
-#### Returns
-
-`MessageProps`
-
-#### Defined in
-
-[src/portalnetwork/client.ts:125](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L125)
-
-___
-
 ### emit
 
 ▸ **emit**(`eventName`, ...`args`): `boolean`
@@ -287,7 +283,7 @@ ___
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `namespaces` | `string` | `"portalnetwork*,discv5*"` | comma separated list of logging namespaces defaults to "portalnetwork*, discv5*" |
+| `namespaces` | `string` | `"portalnetwork*,discv5:service*,<uTP>*"` | comma separated list of logging namespaces defaults to "portalnetwork*, discv5*" |
 
 #### Returns
 
@@ -295,7 +291,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:37](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L37)
+[src/portalnetwork/client.ts:47](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L47)
 
 ___
 
@@ -360,61 +356,64 @@ ___
 
 ### handleFindContent
 
-▸ `Private` **handleFindContent**(`body`): `never`
+▸ `Private` **handleFindContent**(`srcId`, `message`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `body` | `any` |
+| `srcId` | `string` |
+| `message` | `ITalkReqMessage` |
 
 #### Returns
 
-`never`
+`void`
 
 #### Defined in
 
-[src/portalnetwork/client.ts:158](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L158)
+[src/portalnetwork/client.ts:241](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L241)
 
 ___
 
 ### handleFindNodes
 
-▸ `Private` **handleFindNodes**(`body`): `never`
+▸ `Private` **handleFindNodes**(`srcId`, `message`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `body` | `any` |
+| `srcId` | `string` |
+| `message` | `ITalkReqMessage` |
 
 #### Returns
 
-`never`
+`void`
 
 #### Defined in
 
-[src/portalnetwork/client.ts:150](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L150)
+[src/portalnetwork/client.ts:192](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L192)
 
 ___
 
 ### handleOffer
 
-▸ `Private` **handleOffer**(`body`): `never`
+▸ `Private` **handleOffer**(`srcId`, `message`): `Promise`<`void`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `body` | `any` |
+| `srcId` | `string` |
+| `message` | `ITalkReqMessage` |
 
 #### Returns
 
-`never`
+`Promise`<`void`\>
 
 #### Defined in
 
-[src/portalnetwork/client.ts:154](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L154)
+[src/portalnetwork/client.ts:217](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L217)
 
 ___
 
@@ -435,7 +434,28 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:139](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L139)
+[src/portalnetwork/client.ts:181](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L181)
+
+___
+
+### handleUTPStreamRequest
+
+▸ `Private` **handleUTPStreamRequest**(`srcId`, `message`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `srcId` | `string` |
+| `message` | `ITalkReqMessage` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[src/portalnetwork/client.ts:252](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L252)
 
 ___
 
@@ -500,6 +520,26 @@ EventEmitter.listeners
 #### Defined in
 
 node_modules/@types/node/events.d.ts:484
+
+___
+
+### log
+
+▸ **log**(`msg`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `msg` | `any` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:29](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L29)
 
 ___
 
@@ -603,7 +643,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:101](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L101)
+[src/portalnetwork/client.ts:154](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L154)
 
 ___
 
@@ -625,7 +665,7 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:121](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L121)
+[src/portalnetwork/client.ts:177](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L177)
 
 ___
 
@@ -949,6 +989,48 @@ node_modules/@types/node/events.d.ts:439
 
 ___
 
+### sendAccept
+
+▸ `Private` **sendAccept**(`srcId`, `message`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `srcId` | `string` |
+| `message` | `ITalkReqMessage` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[src/portalnetwork/client.ts:229](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L229)
+
+___
+
+### sendFindContent
+
+▸ **sendFindContent**(`dstId`, `key`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `dstId` | `string` |
+| `key` | `Uint8Array` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:103](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L103)
+
+___
+
 ### sendFindNodes
 
 ▸ **sendFindNodes**(`dstId`, `distances`): `void`
@@ -968,7 +1050,28 @@ Sends a Portal Network Wire Protocol FINDNODES request to a peer requesting othe
 
 #### Defined in
 
-[src/portalnetwork/client.ts:73](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L73)
+[src/portalnetwork/client.ts:85](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L85)
+
+___
+
+### sendOffer
+
+▸ **sendOffer**(`dstId`, `contentKeys`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `dstId` | `string` |
+| `contentKeys` | `Uint8Array`[] |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/portalnetwork/client.ts:118](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L118)
 
 ___
 
@@ -990,7 +1093,7 @@ Sends a Portal Network Wire Protocol PING message to a specified node
 
 #### Defined in
 
-[src/portalnetwork/client.ts:46](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L46)
+[src/portalnetwork/client.ts:56](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L56)
 
 ___
 
@@ -1011,7 +1114,27 @@ ___
 
 #### Defined in
 
-[src/portalnetwork/client.ts:90](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L90)
+[src/portalnetwork/client.ts:140](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L140)
+
+___
+
+### sendUtpStreamRequest
+
+▸ **sendUtpStreamRequest**(`dstId`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `dstId` | `string` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[src/portalnetwork/client.ts:135](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L135)
 
 ___
 
@@ -1060,7 +1183,7 @@ Starts the portal network client
 
 #### Defined in
 
-[src/portalnetwork/client.ts:28](https://github.com/acolytec3/portalnetwork/blob/b394578/src/portalnetwork/client.ts#L28)
+[src/portalnetwork/client.ts:38](https://github.com/ethereumjs/portalnetwork/blob/52c3050/src/portalnetwork/client.ts#L38)
 
 ___
 
