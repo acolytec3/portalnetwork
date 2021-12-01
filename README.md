@@ -2,7 +2,7 @@
 
 Will one day be the interface library for the Portal Network
 
-See [API](./docs/index.html) for more details
+See [API](./docs/modules.md) for more details
 
 
 
