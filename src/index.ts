@@ -1,2 +1,2 @@
-export { PortalNetwork } from './portalnetwork/index';
+export { PortalNetwork } from './client/index';
 export { StateNetworkRoutingTable, distance } from './dht/index'
