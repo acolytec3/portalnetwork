@@ -15,7 +15,7 @@
   "author": "acolytec3",
   "license": "MIT",
   "dependencies": {
-    "@chainsafe/discv5": "github:ethereumjs/discv5#ad6239b5d2d3434ad41e35c97767ab83e8dc27c3",
+    "@chainsafe/discv5": "github:ethereumjs/discv5#483f924cbd899994ced78dd513393168de303417",
     "@chainsafe/ssz": "^0.8.19",
     "@types/bn.js": "^5.1.0",
     "bn.js": "^5.2.0",
