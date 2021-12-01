@@ -8,6 +8,7 @@ export declare class PortalNetwork extends EventEmitter {
     stateNetworkRoutingTable: StateNetworkRoutingTable;
     uTP: UtpProtocol;
     constructor(config: IDiscv5CreateOptions);
+    log: (msg: any) => void;
     /**
      * Starts the portal network client
      */
