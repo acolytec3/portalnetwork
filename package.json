@@ -2,8 +2,8 @@
   "name": "portalnetwork",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/portalnetwork.js",
-  "browser": "dist/portalnetwork.js",
+  "main": "dist/index.js",
+  "browser": "dist/index.js",
   "scripts": {
     "dev": "tsc --declaration --outDir dist --watch",
     "build": "tsc --declaration --outDir dist",
