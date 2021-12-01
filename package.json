@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "tsc --declaration --outDir dist --watch",
     "build": "tsc --declaration --outDir dist",
+    "prepare": "npm run build",
     "docs": "typedoc src/index.ts",
     "test": "tape -r  ts-node/register 'tests/**/*.spec.ts'"
   },
@@ -14,7 +15,7 @@
   "author": "acolytec3",
   "license": "MIT",
   "dependencies": {
-    "@chainsafe/discv5": "github:ethereumjs/discv5#013032072633d3cb921e5831e08a2fbda09ab11f",
+    "@chainsafe/discv5": "github:ethereumjs/discv5#ad6239b5d2d3434ad41e35c97767ab83e8dc27c3",
     "@chainsafe/ssz": "^0.8.19",
     "@types/bn.js": "^5.1.0",
     "bn.js": "^5.2.0",
